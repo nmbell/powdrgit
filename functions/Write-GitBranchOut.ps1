@@ -20,7 +20,7 @@ function Write-GitBranchOut
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Write-GitBranchOut.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Write-GitBranchOut.md
 	.LINK
 	about_powdrgit
 	.LINK

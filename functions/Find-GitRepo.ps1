@@ -84,7 +84,7 @@ function Find-GitRepo
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Find-GitRepo.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Find-GitRepo.md
 	.LINK
 	about_powdrgit
 	.LINK

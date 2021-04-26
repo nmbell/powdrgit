@@ -209,7 +209,7 @@ function Get-GitBranch
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Get-GitBranch.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitBranch.md
 	.LINK
 	about_powdrgit
 	.LINK
