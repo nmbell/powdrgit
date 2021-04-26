@@ -1,7 +1,14 @@
 # powdrgit
-## Powershell Driven Git
 
-Powdrgit is a PowerShell module that makes it easy to work across repositories and branches. 
+## SHORT DESCRIPTION
+**Powershell Driven Git**
+
+Powdrgit is a PowerShell module that makes it easy to work across repositories and branches.
+
+## LONG DESCRIPTION
+**Powershell Driven Git**
+
+Powdrgit is a PowerShell module that makes it easy to work across repositories and branches.
 
 Rather than providing wrappers around existing git functionality, the module is centered around four functions that handle repositories and branches as PowerShell objects, and can therefore leverage the PowerShell pipeline for gathering information or making changes to many repositories or branches at once. The module also includes functions that allow object handling for commits and tags, and other functions related to git and powdrgit configuration.
 
@@ -9,28 +16,26 @@ Rather than providing wrappers around existing git functionality, the module is 
 ### The module functions
 
 For working across repositories and branches:
-- Get-GitRepo
-- Set-GitRepo
-- Get-GitBranch
-- Set-GitBranch
+- [Get-GitRepo](help/Get-GitRepo.md)
+- [Set-GitRepo](help/Set-GitRepo.md)
+- [Get-GitBranch](help/Get-GitBranch.md)
+- [Set-GitBranch](help/Set-GitBranch.md)
 
 For working inside a repository:
-- Get-GitCommit
-- Get-GitCommitFile
-- Get-GitFileHistory
-- Get-GitLog
-- Get-GitTag
-- Invoke-GitExpression
+- [Get-GitCommit](help/Get-GitCommit.md)
+- [Get-GitCommitFile](help/Get-GitCommitFile.md)
+- [Get-GitFileHistory](help/Get-GitFileHistory.md)
+- [Get-GitLog](help/Get-GitLog.md)
+- [Get-GitTag](help/Get-GitTag.md)
+- [Invoke-GitExpression](help/Invoke-GitExpression.md)
 
 For repositories and config:
-- Find-GitRepo
-- Test-GitRepoPath
-- Get-GitConfigFile
+- [Find-GitRepo](help/Find-GitRepo.md)
+- [Test-GitRepoPath](help/Test-GitRepoPath.md)
+- [Get-GitConfigFile](help/Get-GitConfigFile.md)
 
-
-## Quick start guide
-
-1. ### Install the module.
+## QUICK START GUIDE
+### 1. Install the module.
    The [module](https://www.powershellgallery.com/packages/powdrgit/1.0.0) is available through the [PowerShell Gallery](https://docs.microsoft.com/en-us/powershell/scripting/gallery/getting-started).
    Run the following command in a PowerShell console to install the module:
    ```
@@ -46,7 +51,7 @@ For repositories and config:
    ```
    If you see a list of functions similar to those above, your install was successful.
 
-2. ### Configure powdrgit.
+### 2. Configure powdrgit.
    Powdrgit needs to know which repositories you're interested in working with. It does this by storing a list of paths to those repositories in a module variable `$GitRepoPath`. Powdrgit will only 'see' repos that are in that list. There are two ways to populate the list:
    - Plain ol' variable assignment:
      - Once the module is loaded, simply add the paths you want, e.g:
@@ -62,14 +67,14 @@ For repositories and config:
        This will set `$GitRepoPath` to the list of all repositories on your C drive.
    If you don't want to have to do this every time you open a console window, you can put the commands that populate the list into your [PowerShell profile](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles).
 
-3. ### Check the configuration.
+### 3. Check the configuration.
    Run:
    ```
    Test-GitRepoPath
    ```
    If a path that was added is not actually git repository (i.e. doesn't have a .git subdirectory), or doesn't exist, a warning is generated. It's safe to leave them in the list, however, as powdrgit will just ignore them. Whether or not any warnings were generated, Test-GitRepoPath will also output a number, which shows the number of valid paths in the list.
 
-4. ### Run your first command.
+### 4. Run your first command.
    You're good to go! Simply run:
    ```
    Get-GitRepo
@@ -77,7 +82,7 @@ For repositories and config:
    You should see the list of the valid repositories that you just added to `$GitRepoPath`.
 
 
-## Learning the commands
+## LEARNING THE COMMANDS
 Each function has numerous examples to help you understand how the function can be used and what results it provides. To view the help for any function, use PowerShell's built-in Get-Help function, e.g.:
 ```
 Get-Help -Full Get-GitRepo
@@ -88,10 +93,7 @@ Many of the examples refer to repositories in the `C:\PowdrgitExamples` director
 
 Note: the SHA1Hash values in the examples will be different to the ones you see on your own computer.
 
-
-
-## Some examples of how powdrgit can be used
-
+## EXAMPLES
 Get a list of every local branch for every repository:
 ```
 Get-GitRepo | Get-GitBranch

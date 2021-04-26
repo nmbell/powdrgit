@@ -6,12 +6,12 @@ function Set-GitBranch
 
 	.DESCRIPTION
 	Checks out the specified branches for the specified repository.
-	An optional script block may be passed in containing git commands to be executed against each specified branch after it has been checked out. The command in the script block will be split by semi-colon, and each command run in turn.
+	An optional script block may be passed in containing git commands to be executed against each specified branch after it has been checked out. The command in the script block will be split by semi-colon (default) or a user-defined separator, and each command run in turn.
 	The output of the command has three components: header (in the form "<RepoName> | <BranchName>"), command, and results. Each section can be directed to the host, the pipeline, or suppressed. By default, the header, command, and results are only written when GitScript is used.
 
 	.PARAMETER RepoName
 	The name of the git repository that has the specified branches.
-	This should match the directory name of one of the repositories defined in $GitRepoPath. If there is no match, a warning is generated.
+	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
 	When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
 
 	.PARAMETER BranchName
@@ -32,7 +32,7 @@ function Set-GitBranch
 	Used to suppress, direct, or color the background of the header output.
 	When the value is 'None', the header will be suppressed.
 	When the value is 'Pipe', the header will be sent to the pipeline.
-	When the value is a standard Powershell color, the header will be written to the host in that color.
+	When the value is a standard Powershell color, the header will be written to the host with a background in that color.
 	When GitScript is provided, default is 'DarkGray'; otherwise it is 'None'.
 
 	.PARAMETER CommandOut
@@ -68,7 +68,7 @@ function Set-GitBranch
 
 	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Set-GitBranch -RepoName NonExistentRepo -BranchName main
-	WARNING: [Set-GitBranch]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath variable.
+	WARNING: [Set-GitBranch]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
 
 	.EXAMPLE
 	## Check out a branch from outside a repository by naming a repository ##
@@ -192,6 +192,10 @@ function Set-GitBranch
 
 	# By piping the results of Get-GitRepo | Get-GitBranch into Set-GitBranch, we can see the status of all branches in all repositories in a single command.
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the RepoName parameter. The output of Get-GitBranch can be piped into Set-GitTag.
+
 	.OUTPUTS
 	[System.String]
 	When output is present, returns String objects.
@@ -200,8 +204,14 @@ function Set-GitBranch
 	Author : nmbell
 
 	.LINK
+	https://github.com/nmbell/powdrgit/help/Set-GitBranch.md
+	.LINK
+	about_powdrgit
+	.LINK
 	Get-GitBranch
+	.LINK
 	Get-GitRepo
+	.LINK
 	Invoke-GitExpression
 	#>
 
@@ -382,7 +392,7 @@ function Set-GitBranch
 		}
 		ElseIf ($RepoName)
 		{
-			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath variable."
+			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
 		}
     }
 

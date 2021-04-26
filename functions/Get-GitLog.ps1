@@ -7,6 +7,11 @@ function Get-GitLog
 	.DESCRIPTION
 	Gets a list of commits from the git log.
 
+	.PARAMETER RepoName
+	The name of the git repository to return.
+	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
+	When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+
 	.PARAMETER InRef
 	A list of repository references (i.e. branch names, tag names, or commit SHA1 hashes).
 	Commits reachable from any of these references are included in the results. If ommitted, defaults to HEAD.
@@ -121,6 +126,10 @@ function Get-GitLog
 
 	# Equivalent to the previous example.
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the RepoName parameter. The output of Get-GitRepo can be piped into Get-GitLog.
+
 	.OUTPUTS
 	[GitCommit]
 	Returns a custom GitCommit object. For details use Get-Member at a command prompt e.g.:
@@ -130,8 +139,14 @@ function Get-GitLog
 	Author : nmbell
 
 	.LINK
+	https://github.com/nmbell/powdrgit/help/Get-GitLog.md
+	.LINK
+	about_powdrgit
+	.LINK
 	Get-GitCommit
+	.LINK
 	Get-GitCommitFile
+	.LINK
 	Get-GitFileHistory
 	#>
 
@@ -144,7 +159,7 @@ function Get-GitLog
     	[Parameter(
     	  Mandatory                       = $false
 		, Position                        = 0
-    	, ValueFromPipeline               = $false
+    	, ValueFromPipeline               = $true
     	, ValueFromPipelineByPropertyName = $true
 		)]
 		[ArgumentCompleter({
@@ -321,7 +336,7 @@ function Get-GitLog
 		}
 		ElseIf ($RepoName)
 		{
-			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath variable."
+			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
 		}
     }
 

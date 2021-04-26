@@ -54,6 +54,10 @@ function Test-SubPath
 
 	# Returns True because the parent path is a subpath of the child path and the child item (and therefore the parent item) exists.
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the ChildPath parameter. The output of Get-ChildItem can be piped into Test-SubPath.
+
 	.OUTPUTS
 	[System.Boolean]
 	Returns a boolean (true/false) object.

@@ -2,15 +2,15 @@ function Get-GitRepo
 {
 	<#
 	.SYNOPSIS
-	Gets the directory objects for valid repositories defined in $GitRepoPath.
+	Gets the directory objects for valid repositories defined in the $GitRepoPath module variable.
 
 	.DESCRIPTION
-	Gets the directory objects for valid repositories defined in $GitRepoPath.
+	Gets the directory objects for valid repositories defined in the $GitRepoPath module variable.
 
 	.PARAMETER RepoName
 	The name of the git repository to return.
 	The powdrgit module always takes the name of the top-level repository directory as the repository name. It does not use values from a repository's config or origin URL as the name.
-	This should match the directory name of one of the repositories defined in $GitRepoPath. If there is no match, nothing will be returned.
+	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, nothing will be returned.
 	When the parameter is omitted, all valid repositories will be returned.
 
 	.PARAMETER Path
@@ -22,7 +22,7 @@ function Get-GitRepo
 	Will return the current repository when the working directory is either the repository directory or any of its subdirectories.
 
 	.EXAMPLE
-	## Get all valid repositories defined in the $GitRepoPath variable ##
+	## Get all valid repositories defined in the $GitRepoPath module variable ##
 
 	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitRepo | Select-Object -ExpandProperty RepoName
@@ -58,6 +58,10 @@ function Get-GitRepo
 
 	# This time the repository name is returned because we were inside a repository.
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the RepoName parameter.
+
 	.OUTPUTS
 	[System.IO.DirectoryInfo] (extended)
 	Returns directory objects extended with a RepoName (String) alias property.
@@ -66,8 +70,14 @@ function Get-GitRepo
 	Author : nmbell
 
 	.LINK
+	https://github.com/nmbell/powdrgit/help/Get-GitRepo.md
+	.LINK
+	about_powdrgit
+	.LINK
 	Find-GitRepo
+	.LINK
 	Set-GitRepo
+	.LINK
 	Test-GitRepoPath
 	#>
 
@@ -133,7 +143,7 @@ function Get-GitRepo
 	{
 		$wvBlock = 'P'
 
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Getting list of repositories from `$GitRepoPath"
+		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Getting list of repositories from the `$GitRepoPath module variable"
 		ForEach ($repoPath in (Test-GitRepoPath -PassThru -NoWarn)) # suppress warning output here
 		{
 			Get-Item -Path $repoPath -ErrorAction SilentlyContinue `

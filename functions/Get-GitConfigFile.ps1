@@ -9,7 +9,7 @@ function Get-GitConfigFile
 
 	.PARAMETER RepoName
 	The name of the git repository to return.
-	This should match the directory name of one of the repositories defined in $GitRepoPath. If there is no match, a warning is generated.
+	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
 	When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
 
 	.PARAMETER Local
@@ -49,7 +49,7 @@ function Get-GitConfigFile
 
 	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitConfigFile -RepoName NonExistentRepo -Local
-	WARNING: [Get-GitConfigFile]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath variable.
+	WARNING: [Get-GitConfigFile]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
 
 	.EXAMPLE
 	## Call from outside a repository with RepoName parameter ##
@@ -95,6 +95,10 @@ function Get-GitConfigFile
 
 	# System and Global config files are returned only once per call.
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the RepoName parameter. The output of Get-GitRepo can be piped into Get-GitConfigFile.
+
 	.OUTPUTS
 	[GitConfigFile]
 	Returns a custom GitConfigFile object. For details use Get-Member at a command prompt e.g.:
@@ -103,6 +107,10 @@ function Get-GitConfigFile
 	.NOTES
 	Author : nmbell
 
+	.LINK
+	https://github.com/nmbell/powdrgit/help/Get-GitConfigFile.md
+	.LINK
+	about_powdrgit
 	.LINK
 	Get-GitRepo
 	#>
@@ -116,7 +124,7 @@ function Get-GitConfigFile
     	[Parameter(
     	  Mandatory                       = $false
 		, Position                        = 0
-    	, ValueFromPipeline               = $false
+    	, ValueFromPipeline               = $true
     	, ValueFromPipelineByPropertyName = $true
 		)]
 		[ArgumentCompleter({
@@ -187,7 +195,7 @@ function Get-GitConfigFile
 			}
 			ElseIf ($RepoName)
 			{
-				Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath variable."
+				Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
 			}
 		}
     }

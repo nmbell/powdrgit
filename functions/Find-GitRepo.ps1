@@ -16,20 +16,18 @@ function Find-GitRepo
 	Populates the $GitRepoPath module variable with a list of the paths for all found repositories.
 
 	.PARAMETER AppendGitRepoPath
-	Appends the list of paths for all found repositories to the $GitRepoPath module.
-	Paths that are already in the $GitRepoPath variable will not be duplicated.
+	Appends the list of paths for all found repositories to the $GitRepoPath module variable.
+	Paths that are already in the $GitRepoPath module variable will not be duplicated.
 
 	.EXAMPLE
 	## Find git repositories under a root directory ##
-
-	# This example assumes the C:\PowdrgitExamples\MyToolbox and C:\PowdrgitExamples\Project1 directories exist and are git repositories (i.e. contain a .git subdirectory).
 
 	PS C:\> Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' | Select-Object -ExpandProperty FullName
 	C:\PowdrgitExamples\MyToolbox
 	C:\PowdrgitExamples\Project1
 
 	.EXAMPLE
-	## Populate the $GitRepoPath variable with SetGitRepoPath parameter ##
+	## Populate the $GitRepoPath module variable with SetGitRepoPath parameter ##
 
 	PS C:\> $GitRepoPath = $null
 	PS C:\> Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' -SetGitRepoPath | Out-Null
@@ -37,7 +35,7 @@ function Find-GitRepo
 	C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1
 
 	.EXAMPLE
-	## Populate the $GitRepoPath variable with function output ##
+	## Populate the $GitRepoPath module variable with function output ##
 
 	PS C:\> $GitRepoPath = $null
 	PS C:\> $GitRepoPath = (Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' | Select-Object -ExpandProperty FullName) -join ';'
@@ -49,9 +47,9 @@ function Find-GitRepo
 	# $GitRepoPath = (Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' | Where-Object Name -ne 'MyToolbox' | Select-Object -ExpandProperty FullName) -join ';'
 
 	.EXAMPLE
-	## Use AppendGitRepoPath to add new repositories to the $GitRepoPath variable ##
+	## Use AppendGitRepoPath to add new repositories to the $GitRepoPath module variable ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # ensure the existing repository paths are defined
+	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the existing repository paths are defined
 	PS C:\> git init "C:\PowdrgitExamples2\Project2" 2>&1 | Out-Null # create a new git repository
 	PS C:\> Find-GitRepo -RootDirectory 'C:\PowdrgitExamples2' -AppendGitRepoPath | Out-Null
 	PS C:\> $GitRepoPath
@@ -74,6 +72,10 @@ function Find-GitRepo
 
 	# Path and FullName are aliases for the RootDirectory parameter, allowing directory objects to be piped to Find-GitRepo.
 
+	.INPUTS
+	[System.IO.DirectoryInfo]
+	Accepts directory objects.
+
 	.OUTPUTS
 	[System.IO.DirectoryInfo]
 	Returns directory objects.
@@ -82,8 +84,14 @@ function Find-GitRepo
 	Author : nmbell
 
 	.LINK
+	https://github.com/nmbell/powdrgit/help/Find-GitRepo.md
+	.LINK
+	about_powdrgit
+	.LINK
 	Get-GitRepo
+	.LINK
 	Set-GitRepo
+	.LINK
 	Test-GitRepoPath
 	#>
 
@@ -173,17 +181,17 @@ function Find-GitRepo
 
 		If ($SetGitRepoPath)
 		{
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting `$GitRepoPath variable"
+			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting `$GitRepoPath module variable"
 			$script:GitRepoPath = ($gitReposAll | Select-Object -ExpandProperty FullName) -join ';'
 		}
 
 		If ($AppendGitRepoPath)
 		{
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Appending to `$GitRepoPath variable"
+			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Appending to `$GitRepoPath module variable"
 			$script:GitRepoPath += (';'*[Bool]$script:GitRepoPath)+(($gitReposAll | Select-Object -ExpandProperty FullName) -join ';')
 		}
 
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Deduping and ordering items in `$GitRepoPath variable"
+		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Deduping and ordering items in `$GitRepoPath module variable"
 		$script:GitRepoPath = (($script:GitRepoPath -split ';') | Select-Object -Unique | Sort-Object) -join ';'
     }
 
