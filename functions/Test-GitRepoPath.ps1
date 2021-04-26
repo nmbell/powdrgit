@@ -121,7 +121,7 @@ function Test-GitRepoPath
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Test-GitRepoPath.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Test-GitRepoPath.md
 	.LINK
 	about_powdrgit
 	.LINK

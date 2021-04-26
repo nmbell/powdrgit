@@ -65,7 +65,7 @@ function Set-GitRepo
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Set-GitRepo.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Set-GitRepo.md
 	.LINK
 	about_powdrgit
 	.LINK

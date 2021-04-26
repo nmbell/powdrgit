@@ -66,7 +66,7 @@ function Get-GitTag
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Get-GitTag.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitTag.md
 	.LINK
 	about_powdrgit
 	.LINK

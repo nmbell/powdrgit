@@ -108,7 +108,7 @@ function Get-GitConfigFile
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Get-GitConfigFile.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitConfigFile.md
 	.LINK
 	about_powdrgit
 	.LINK

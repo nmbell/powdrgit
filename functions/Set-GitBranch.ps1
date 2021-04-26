@@ -204,7 +204,7 @@ function Set-GitBranch
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Set-GitBranch.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Set-GitBranch.md
 	.LINK
 	about_powdrgit
 	.LINK

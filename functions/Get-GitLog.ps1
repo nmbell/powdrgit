@@ -139,7 +139,7 @@ function Get-GitLog
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Get-GitLog.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitLog.md
 	.LINK
 	about_powdrgit
 	.LINK

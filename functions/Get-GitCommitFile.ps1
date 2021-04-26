@@ -83,7 +83,7 @@ function Get-GitCommitFile
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Get-GitCommitFile.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitCommitFile.md
 	.LINK
 	about_powdrgit
 	.LINK

@@ -84,7 +84,7 @@ function Get-GitCommit
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Get-GitCommit.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitCommit.md
 	.LINK
 	about_powdrgit
 	.LINK

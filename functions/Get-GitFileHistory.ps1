@@ -83,7 +83,7 @@ function Get-GitFileHistory
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/help/Get-GitFileHistory.md
+	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitFileHistory.md
 	.LINK
 	about_powdrgit
 	.LINK
