@@ -10,7 +10,7 @@ function Get-GitTag
 
 	.PARAMETER RepoName
 	The name of the git repository to return.
-	This should match the directory name of one of the repositories defined in $GitRepoPath. If there is no match, a warning is generated.
+	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
 	When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
 
 	.EXAMPLE
@@ -26,7 +26,7 @@ function Get-GitTag
 
 	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitTag -RepoName NonExistentRepo
-	WARNING: [Get-GitTag]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath variable.
+	WARNING: [Get-GitTag]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
 
 	.EXAMPLE
 	## Call from outside a repository with RepoName parameter ##
@@ -53,6 +53,10 @@ function Get-GitTag
 	MyToolbox annotatedTag   tag     This is an annotated tag
 	MyToolbox lightweightTag commit  feature1 commit
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the RepoName parameter. The output of Get-GitRepo can be piped into Get-GitTag.
+
 	.OUTPUTS
 	[GitTag]
 	Returns a custom GitTag object. For details use Get-Member at a command prompt e.g.:
@@ -62,7 +66,12 @@ function Get-GitTag
 	Author : nmbell
 
 	.LINK
+	https://github.com/nmbell/powdrgit/help/Get-GitTag.md
+	.LINK
+	about_powdrgit
+	.LINK
 	Get-GitBranch
+	.LINK
 	Get-GitRepo
 	#>
 
@@ -75,7 +84,7 @@ function Get-GitTag
     	[Parameter(
     	  Mandatory                       = $false
     	, Position                        = 0
-    	, ValueFromPipeline               = $false
+    	, ValueFromPipeline               = $true
     	, ValueFromPipelineByPropertyName = $true
 		)]
 		[ArgumentCompleter({
@@ -152,7 +161,7 @@ function Get-GitTag
 		}
 		ElseIf ($RepoName)
 		{
-			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath variable."
+			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
 		}
     }
 

@@ -10,7 +10,7 @@ function Get-GitBranch
 
 	.PARAMETER RepoName
 	The name of the git repository to return.
-	This should match the directory name of one of the repositories defined in $GitRepoPath. If there is no match, a warning is generated.
+	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
 	When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
 
 	.PARAMETER Current
@@ -18,6 +18,10 @@ function Get-GitBranch
 
 	.PARAMETER CurrentFirst
 	Forces the current branch to be the first returned item.
+	All other branches will be returned in branch name (alphabetical) order.
+
+	.PARAMETER CurrentLast
+	Forces the current branch to be the last returned item.
 	All other branches will be returned in branch name (alphabetical) order.
 
 	.PARAMETER IncludeRemote
@@ -43,7 +47,7 @@ function Get-GitBranch
 
 	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitBranch -RepoName NonExistentRepo
-	WARNING: [Get-GitBranch]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath variable.
+	WARNING: [Get-GitBranch]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
 
 	.EXAMPLE
 	## Call from outside a repository with RepoName parameter ##
@@ -192,6 +196,10 @@ function Get-GitBranch
 
 	# The Current switch caused only the checked out branch to be returned.
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the RepoName parameter. The output of Get-GitRepo can be piped into Get-GitBranch.
+
 	.OUTPUTS
 	[GitBranch]
 	Returns a custom GitBranch object. For details use Get-Member at a command prompt e.g.:
@@ -201,7 +209,12 @@ function Get-GitBranch
 	Author : nmbell
 
 	.LINK
+	https://github.com/nmbell/powdrgit/help/Get-GitBranch.md
+	.LINK
+	about_powdrgit
+	.LINK
 	Get-GitRepo
+	.LINK
 	Set-GitBranch
 	#>
 
@@ -340,7 +353,7 @@ function Get-GitBranch
 		}
 		ElseIf ($RepoName)
 		{
-			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath variable."
+			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
 		}
     }
 

@@ -77,6 +77,10 @@ function Invoke-GitExpression
 
 	# Using both switches suppresses all output, equivalent to piping to Out-Null.
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the Command parameter.
+
 	.OUTPUTS
 	[System.String]
 	Returns String objects.
@@ -84,6 +88,10 @@ function Invoke-GitExpression
 	.NOTES
 	Author : nmbell
 
+	.LINK
+	https://github.com/nmbell/powdrgit/help/Invoke-GitExpression.md
+	.LINK
+	about_powdrgit
 	.LINK
 	Set-GitBranch
 	#>

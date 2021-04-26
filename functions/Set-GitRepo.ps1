@@ -10,7 +10,7 @@ function Set-GitRepo
 	.PARAMETER RepoName
 	The name of the git repository to return.
 	The powdrgit module always takes the name of the top-level repository directory as the repository name. It does not use values from a repository's config or origin URL as the name.
-	This should match the directory name of one of the repositories defined in $GitRepoPath. If there is no match, a warning is generated.
+	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
 
 	.PARAMETER PassThru
 	Returns the directory object for the repository top-level directory.
@@ -29,7 +29,7 @@ function Set-GitRepo
 
 	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Set-GitRepo -RepoName NonExistentRepo
-	WARNING: [Set-GitRepo]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath variable.
+	WARNING: [Set-GitRepo]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
 	PS C:\>
 
 	# The current location (reflected in the prompt) did not change.
@@ -53,6 +53,10 @@ function Set-GitRepo
 
 	# Because the object returned is an extension of a file system object, any of its usual properties are available in the output.
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the RepoName parameter.
+
 	.OUTPUTS
 	[System.IO.DirectoryInfo]
 	When the PassThru switch is used, returns directory objects.
@@ -61,8 +65,14 @@ function Set-GitRepo
 	Author : nmbell
 
 	.LINK
+	https://github.com/nmbell/powdrgit/help/Set-GitRepo.md
+	.LINK
+	about_powdrgit
+	.LINK
 	Find-GitRepo
+	.LINK
 	Get-GitRepo
+	.LINK
 	Test-GitRepoPath
 	#>
 
@@ -125,7 +135,7 @@ function Set-GitRepo
 		}
 		ElseIf ($RepoName)
 		{
-			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath variable."
+			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
 		}
     }
 

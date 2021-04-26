@@ -9,7 +9,7 @@ function Get-GitCommit
 
 	.PARAMETER RepoName
 	The name of the git repository to return.
-	This should match the directory name of one of the repositories defined in $GitRepoPath. If there is no match, a warning is generated.
+	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
 	When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
 
 	.PARAMETER SHA1Hash
@@ -28,7 +28,7 @@ function Get-GitCommit
 
 	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitCommit -RepoName NonExistentRepo
-	WARNING: [Get-GitCommit]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath variable.
+	WARNING: [Get-GitCommit]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
 
 	.EXAMPLE
 	## Call from outside a repository with RepoName parameter ##
@@ -71,6 +71,10 @@ function Get-GitCommit
 	# Output is identical to:
 	# PS C:\PowdrgitExamples\MyToolbox> Get-GitLog | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the SHA1Hash parameter. The output of Get-GitLog can be piped into Get-GitCommit.
+
 	.OUTPUTS
 	[GitCommit]
 	Returns a custom GitCommit object. For details use Get-Member at a command prompt e.g.:
@@ -80,8 +84,14 @@ function Get-GitCommit
 	Author : nmbell
 
 	.LINK
+	https://github.com/nmbell/powdrgit/help/Get-GitCommit.md
+	.LINK
+	about_powdrgit
+	.LINK
 	Get-GitCommitFile
+	.LINK
 	Get-GitFileHistory
+	.LINK
 	Get-GitLog
 	#>
 
@@ -190,7 +200,7 @@ function Get-GitCommit
 		}
 		ElseIf ($RepoName)
 		{
-			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath variable."
+			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
 		}
     }
 

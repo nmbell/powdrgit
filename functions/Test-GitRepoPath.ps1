@@ -6,18 +6,26 @@ function Test-GitRepoPath
 
 	.DESCRIPTION
 	Validates the paths stored in the $GitRepoPath module variable.
-	The functions evaluates each path and returns the count of paths in the $GitRepoPath variable that are valid git repositories.
+	The functions evaluates each path and returns the count of paths in the $GitRepoPath module variable that are valid git repositories.
 	A warning message is also generated when:
-		- a path doesn't exist; or
-		- a path is not a git repository; or
-		- the $GitRepoPath variable is not defined (i.e. an empty string or $null)
+	 - a path doesn't exist; or
+	 - a path is not a git repository; or
+	 - the $GitRepoPath module variable is not defined (i.e. an empty string or $null).
 	A NoWarn switch allows these warnings to be suppressed.
 	A PassThru parameter allows a string array of only valid paths to be returned instead of the count of valid paths.
+
+	.PARAMETER NoWarn
+	Suppresses warnings.
+
+	.PARAMETER PassThru
+	Returns a string array of only valid paths.
 
 	.EXAMPLE
 	## Valid paths ##
 
-	# This example assumes the C:\PowdrgitExamples\MyToolbox and C:\PowdrgitExamples\Project1 directories exist and are git repositories (i.e. contain a .git subdirectory).
+	# This example assumes that:
+	# - C:\PowdrgitExamples\MyToolbox directory exists and is a git repository (i.e. contains a .git subdirectory).
+	# - C:\PowdrgitExamples\Project1 directory exists and is a git repository (i.e. contains a .git subdirectory).
 
 	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1'
 	PS C:\> Test-GitRepoPath
@@ -27,9 +35,10 @@ function Test-GitRepoPath
 	## Valid and invalid paths ##
 
 	# This example assumes that:
-	#     - C:\PowdrgitExamples\MyToolbox and C:\PowdrgitExamples\Project1 directories exist and are git repositories (i.e. contain a .git subdirectory).
-	#     - C:\PowdrgitExamples\NotAGitRepo directory exists but is not a git repository (i.e. does not contain a .git subdirectory).
-	#     - C:\PowdrgitExamples\NonExistentFolder directory does not exist.
+	# - C:\PowdrgitExamples\MyToolbox directory exists and is a git repository (i.e. contains a .git subdirectory).
+	# - C:\PowdrgitExamples\Project1 directory exists and is a git repository (i.e. contains a .git subdirectory).
+	# - C:\PowdrgitExamples\NotAGitRepo directory exists but is not a git repository (i.e. does not contain a .git subdirectory).
+	# - C:\PowdrgitExamples\NonExistentFolder directory does not exist.
 
 	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1;C:\PowdrgitExamples\NotAGitRepo;C:\PowdrgitExamples\NonExistentFolder'
 	PS C:\> Test-GitRepoPath
@@ -38,24 +47,25 @@ function Test-GitRepoPath
 	2
 
 	.EXAMPLE
-	## $GitRepoPath is undefined ##
+	## The $GitRepoPath module variable is undefined ##
 
 	PS C:\> $GitRepoPath = $null
 	PS C:\> Test-GitRepoPath
-	WARNING: [Test-GitRepoPath]$GitRepoPath variable is not defined.
+	WARNING: [Test-GitRepoPath]The $GitRepoPath module variable is not defined.
 	0
 	PS C:\> $GitRepoPath = ''
 	PS C:\> Test-GitRepoPath
-	WARNING: [Test-GitRepoPath]$GitRepoPath variable is not defined.
+	WARNING: [Test-GitRepoPath]The $GitRepoPath module variable is not defined.
 	0
 
 	.EXAMPLE
 	## Valid and invalid paths - suppress warnings with -NoWarn ##
 
 	# This example assumes that:
-	#     - C:\PowdrgitExamples\MyToolbox and C:\PowdrgitExamples\Project1 directories exist and are git repositories (i.e. contain a .git subdirectory).
-	#     - C:\PowdrgitExamples\NotAGitRepo directory exists but is not a git repository (i.e. does not contain a .git subdirectory).
-	#     - C:\PowdrgitExamples\NonExistentFolder directory does not exist.
+	# - C:\PowdrgitExamples\MyToolbox directory exists and is a git repository (i.e. contains a .git subdirectory).
+	# - C:\PowdrgitExamples\Project1 directory exists and is a git repository (i.e. contains a .git subdirectory).
+	# - C:\PowdrgitExamples\NotAGitRepo directory exists but is not a git repository (i.e. does not contain a .git subdirectory).
+	# - C:\PowdrgitExamples\NonExistentFolder directory does not exist.
 
 	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1;C:\PowdrgitExamples\NotAGitRepo;C:\PowdrgitExamples\NonExistentFolder'
 	PS C:\> $MyWarnings = $null
@@ -73,15 +83,16 @@ function Test-GitRepoPath
 	PS C:\> $MyWarnings
 	PS C:\>
 
-	# $MyWarnings is empty beacuse warnings were never generated.
+	# $MyWarnings is empty because warnings were never generated.
 
 	.EXAMPLE
 	## Valid and invalid paths - return an array of valid paths with PassThru ##
 
 	# This example assumes that
-	#    - C:\PowdrgitExamples\MyToolbox and C:\PowdrgitExamples\Project1 directories exist and are git repositories (i.e. contain a .git subdirectory).
-	#    - C:\PowdrgitExamples\NotAGitRepo directory exists but is not a git repository (i.e. does not contain a .git subdirectory).
-	#    - C:\PowdrgitExamples\NonExistentFolder directory does not exist.
+	# - C:\PowdrgitExamples\MyToolbox directory exists and is a git repository (i.e. contains a .git subdirectory).
+	# - C:\PowdrgitExamples\Project1 directory exists and is a git repository (i.e. contains a .git subdirectory).
+	# - C:\PowdrgitExamples\NotAGitRepo directory exists but is not a git repository (i.e. does not contain a .git subdirectory).
+	# - C:\PowdrgitExamples\NonExistentFolder directory does not exist.
 
 	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1;C:\PowdrgitExamples\NotAGitRepo;C:\PowdrgitExamples\NonExistentFolder'
 	PS C:\> $GitRepoPath -split ';'
@@ -90,13 +101,16 @@ function Test-GitRepoPath
 	C:\PowdrgitExamples\NotAGitRepo
 	C:\PowdrgitExamples\NonExistentFolder
 
-	# All paths in the $GitRepoPath variable were returned.
+	# All paths in the $GitRepoPath module variable were returned.
 
 	PS C:\> Test-GitRepoPath -NoWarn -PassThru
 	C:\PowdrgitExamples\MyToolbox
 	C:\PowdrgitExamples\Project1
 
 	# Only the paths that are valid git repositories were returned.
+
+	.INPUTS
+	None.
 
 	.OUTPUTS
 	[System.Int32]
@@ -107,8 +121,14 @@ function Test-GitRepoPath
 	Author : nmbell
 
 	.LINK
+	https://github.com/nmbell/powdrgit/help/Test-GitRepoPath.md
+	.LINK
+	about_powdrgit
+	.LINK
 	Find-GitRepo
+	.LINK
 	Get-GitRepo
+	.LINK
 	Set-GitRepo
 	#>
 
@@ -150,7 +170,7 @@ function Test-GitRepoPath
 		{
 			If (!$NoWarn)
 			{
-				Write-Warning "[$thisFunctionName]`$GitRepoPath variable is not defined."
+				Write-Warning "[$thisFunctionName]The `$GitRepoPath module variable is not defined."
 			}
 		}
 

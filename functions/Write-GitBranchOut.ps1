@@ -13,12 +13,16 @@ function Write-GitBranchOut
 	.PARAMETER OutputValue
 	The value to output.
 
-	.PARAMETER OutputValue
+	.PARAMETER OutputStream
 	The stream to output to.
 
 	.NOTES
 	Author : nmbell
 
+	.LINK
+	https://github.com/nmbell/powdrgit/help/Write-GitBranchOut.md
+	.LINK
+	about_powdrgit
 	.LINK
 	Set-GitBranch
 	#>
