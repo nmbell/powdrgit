@@ -1,4 +1,4 @@
-# powdrgit
+# powdrgit 1.0.2
 
 ## Description
 Powdrgit is a PowerShell module that makes it easy to work across repositories and branches.
