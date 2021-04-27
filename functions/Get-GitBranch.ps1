@@ -209,8 +209,6 @@ function Get-GitBranch
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitBranch.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Get-GitRepo
@@ -219,7 +217,10 @@ function Get-GitBranch
 	#>
 
     # Use cmdlet binding
-	[CmdletBinding(DefaultParameterSetName = 'Remote')]
+	[CmdletBinding(
+	  DefaultParameterSetName = 'Remote'
+	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitBranch.md'
+	)]
 
     # Declare parameters
     Param(

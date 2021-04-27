@@ -84,8 +84,6 @@ function Find-GitRepo
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Find-GitRepo.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Get-GitRepo
@@ -96,7 +94,10 @@ function Find-GitRepo
 	#>
 
     # Use cmdlet binding
-	[CmdletBinding(DefaultParameterSetName = 'Set')]
+	[CmdletBinding(
+	  DefaultParameterSetName = 'Set'
+	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Find-GitRepo.md'
+	)]
 
     # Declare parameters
     Param(

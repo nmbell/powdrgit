@@ -139,8 +139,6 @@ function Get-GitLog
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitLog.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Get-GitCommit
@@ -151,7 +149,10 @@ function Get-GitLog
 	#>
 
     # Use cmdlet binding
-	[CmdletBinding(DefaultParameterSetName = 'InRef')]
+	[CmdletBinding(
+	  DefaultParameterSetName = 'InRef'
+	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitLog.md'
+	)]
 
     # Declare parameters
     Param(

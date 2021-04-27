@@ -147,3 +147,4 @@ EXAMPLES
     Capture all the output from a git command in a variable:
 
     $results = Invoke-GitExpression -Command 'git status'
+

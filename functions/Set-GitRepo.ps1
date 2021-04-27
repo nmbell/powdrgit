@@ -65,8 +65,6 @@ function Set-GitRepo
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Set-GitRepo.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Find-GitRepo
@@ -77,7 +75,9 @@ function Set-GitRepo
 	#>
 
     # Use cmdlet binding
-	[CmdletBinding()]
+    [CmdletBinding(
+	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Set-GitRepo.md'
+	)]
 
     # Declare parameters
     Param(

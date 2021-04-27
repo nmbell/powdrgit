@@ -20,15 +20,15 @@ function Write-GitBranchOut
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Write-GitBranchOut.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Set-GitBranch
 	#>
 
     # Use cmdlet binding
-	[CmdletBinding()]
+    [CmdletBinding(
+	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Write-GitBranchOut.md'
+	)]
 
 	# Suppress warnings from PSScriptAnalyzer
 	[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost","")]

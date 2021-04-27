@@ -1,9 +1,11 @@
 ﻿# powdrgit 1.0.2
 
+
 ## SHORT DESCRIPTION
 **Powershell Driven Git**
 
 Powdrgit is a PowerShell module that makes it easy to work across repositories and branches.
+
 
 ## LONG DESCRIPTION
 **Powershell Driven Git**
@@ -11,7 +13,6 @@ Powdrgit is a PowerShell module that makes it easy to work across repositories a
 Powdrgit is a PowerShell module that makes it easy to work across repositories and branches.
 
 Rather than providing wrappers around existing git functionality, the module is centered around four functions that handle repositories and branches as PowerShell objects, and can therefore leverage the PowerShell pipeline for gathering information or making changes to many repositories or branches at once. The module also includes functions that allow object handling for commits and tags, and other functions related to git and powdrgit configuration.
-
 
 ### The module functions
 
@@ -33,6 +34,7 @@ For repositories and config:
 - [Find-GitRepo](Find-GitRepo.md)
 - [Test-GitRepoPath](Test-GitRepoPath.md)
 - [Get-GitConfigFile](Get-GitConfigFile.md)
+
 
 ## QUICK START GUIDE
 ### 1. Install the module.
@@ -92,6 +94,7 @@ Many of the examples refer to repositories in the `C:\PowdrgitExamples` director
 [Powdrgit Help Examples - Setup Script](https://gist.github.com/nmbell/10dad7587ef640618036461c7d212981)
 
 Note: the SHA1Hash values in the examples will be different to the ones you see on your own computer.
+
 
 ## EXAMPLES
 Get a list of every local branch for every repository:

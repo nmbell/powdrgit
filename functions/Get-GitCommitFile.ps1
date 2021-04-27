@@ -83,8 +83,6 @@ function Get-GitCommitFile
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitCommitFile.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Get-GitCommit
@@ -95,7 +93,9 @@ function Get-GitCommitFile
 	#>
 
     # Use cmdlet binding
-    [CmdletBinding()]
+    [CmdletBinding(
+	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitCommitFile.md'
+	)]
 
     # Declare parameters
     Param(
