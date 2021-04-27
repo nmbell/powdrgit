@@ -83,8 +83,6 @@ function Get-GitFileHistory
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitFileHistory.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Get-GitCommit
@@ -95,7 +93,9 @@ function Get-GitFileHistory
 	#>
 
     # Use cmdlet binding
-    [CmdletBinding()]
+    [CmdletBinding(
+	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitFileHistory.md'
+	)]
 
     # Declare parameters
     Param(

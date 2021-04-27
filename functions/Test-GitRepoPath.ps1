@@ -121,8 +121,6 @@ function Test-GitRepoPath
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Test-GitRepoPath.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Find-GitRepo
@@ -133,7 +131,9 @@ function Test-GitRepoPath
 	#>
 
     # Use cmdlet binding
-    [CmdletBinding()]
+    [CmdletBinding(
+	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Test-GitRepoPath.md'
+	)]
 
     # Declare parameters
     Param(

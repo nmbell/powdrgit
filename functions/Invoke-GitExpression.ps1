@@ -89,15 +89,15 @@ function Invoke-GitExpression
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Invoke-GitExpression.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Set-GitBranch
 	#>
 
     # Use cmdlet binding
-    [CmdletBinding()]
+    [CmdletBinding(
+	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Invoke-GitExpression.md'
+	)]
 
     # Declare parameters
 	Param

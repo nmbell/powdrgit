@@ -204,8 +204,6 @@ function Set-GitBranch
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Set-GitBranch.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Get-GitBranch
@@ -216,7 +214,9 @@ function Set-GitBranch
 	#>
 
     # Use cmdlet binding
-    [CmdletBinding()]
+    [CmdletBinding(
+	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Set-GitBranch.md'
+	)]
 
     # Declare parameters
     Param(

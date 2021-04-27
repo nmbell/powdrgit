@@ -108,15 +108,15 @@ function Get-GitConfigFile
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitConfigFile.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Get-GitRepo
 	#>
 
     # Use cmdlet binding
-    [CmdletBinding()]
+    [CmdletBinding(
+	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitConfigFile.md'
+	)]
 
     # Declare parameters
     Param(

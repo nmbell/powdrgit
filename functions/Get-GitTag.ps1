@@ -66,8 +66,6 @@ function Get-GitTag
 	Author : nmbell
 
 	.LINK
-	https://github.com/nmbell/powdrgit/blob/main/help/Get-GitTag.md
-	.LINK
 	about_powdrgit
 	.LINK
 	Get-GitBranch
@@ -76,7 +74,9 @@ function Get-GitTag
 	#>
 
     # Use cmdlet binding
-	[CmdletBinding()]
+    [CmdletBinding(
+	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitTag.md'
+	)]
 
     # Declare parameters
     Param(
