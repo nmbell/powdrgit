@@ -1,4 +1,4 @@
-﻿# powdrgit
+﻿# powdrgit 1.0.2
 
 ## SHORT DESCRIPTION
 **Powershell Driven Git**
@@ -36,7 +36,7 @@ For repositories and config:
 
 ## QUICK START GUIDE
 ### 1. Install the module.
-   The [module](https://www.powershellgallery.com/packages/powdrgit/1.0.0) is available through the [PowerShell Gallery](https://docs.microsoft.com/en-us/powershell/scripting/gallery/getting-started).
+   The [module](https://www.powershellgallery.com/packages/powdrgit/1.0.2) is available through the [PowerShell Gallery](https://docs.microsoft.com/en-us/powershell/scripting/gallery/getting-started).
    Run the following command in a PowerShell console to install the module:
    ```
    Install-Module -Name powdrgit -Force
