@@ -2,6 +2,7 @@ class GitBranch
 {
 
 	[String]$RepoName
+	[String]$RepoPath
 	[String]$SHA1Hash
 	[String]$BranchName
 	[Bool]  $IsCheckedOut

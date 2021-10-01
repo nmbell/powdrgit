@@ -1,0 +1,10 @@
+{
+	"AutoCompleteFullPaths"     : false
+,	"DebugIndentChar"           : ">"
+,	"DefaultCloneUrl"           : null
+,	"DefaultDir"                : null
+,	"DefaultGitScriptSeparator" : ";"
+,	"DefaultInitialCommit"      : "Initial commit"
+,	"ShowWarnings"              : true
+,	"Path"                      : null
+}

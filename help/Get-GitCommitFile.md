@@ -1,4 +1,4 @@
-﻿# Get-GitCommitFile
+# Get-GitCommitFile
 
 ## SYNOPSIS
 Gets the files associated with a commit.
@@ -6,7 +6,7 @@ Gets the files associated with a commit.
 ## SYNTAX
 
 ```
-Get-GitCommitFile [[-RepoName] <String>] [[-SHA1Hash] <String>] [<CommonParameters>]
+Get-GitCommitFile [[-Repo] <String[]>] [[-SHA1Hash] <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -18,28 +18,29 @@ Gets the files associated with a commit.
 ```
 ## Call from outside a repository without parameters ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 PS C:\> Get-GitCommitFile
 
-# Nothing was returned because a RepoName was not provided.
+# Nothing was returned because a Repo was not provided.
 ```
 
 ### EXAMPLE 2
 ```
 ## Call from outside a repository for non-existent repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Get-GitCommitFile -RepoName NonExistentRepo
-WARNING: [Get-GitCommitFile]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+PS C:\> Get-GitCommitFile -Repo NonExistentRepo
+WARNING: [Get-GitCommitFile]Repository 'NonExistentRepo' not found. Check the repository directory exists and has been added to the $Powdrgit.Path module variable.
 ```
 
 ### EXAMPLE 3
 ```
-## Call from outside a repository with RepoName parameter ##
+## Call from outside a repository with Repo parameter ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main # checkout the main branch from the current location
-PS C:\> Get-GitCommitFile -RepoName MyToolbox | Format-Table -Property RepoName,SHA1Hash,Exists,FullName
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main # checkout the main branch from the current location
+PS C:\> Get-GitCommitFile -Repo MyToolbox | Format-Table -Property RepoName,SHA1Hash,Exists,FullName
 
 RepoName  SHA1Hash                                 Exists FullName
 --------  --------                                 ------ --------
@@ -52,10 +53,10 @@ MyToolbox ba6dfdc703948adbd01590c965932ae8ff692aa0  False
 ```
 ## Call from inside a repository with SHA1Hash parameter ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
-PS C:\PowdrgitExamples\MyToolbox\> $commitHash = Get-GitLog -NoMerges | Where-Object Subject -eq 'Add feature1_File1.txt' | Select-Object -ExpandProperty SHA1Hash # pick a commit from the log
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitCommitFile -SHA1Hash $commitHash | Format-Table -Property RepoName,SHA1Hash,Exists,FullName
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+PS C:\PowdrgitExamples\MyToolbox> $commitHash = Get-GitLog -NoMerges | Where-Object Subject -eq 'Add feature1_File1.txt' | Select-Object -ExpandProperty SHA1Hash # pick a commit from the log
+PS C:\PowdrgitExamples\MyToolbox> Get-GitCommitFile -SHA1Hash $commitHash | Format-Table -Property RepoName,SHA1Hash,Exists,FullName
 
 RepoName  SHA1Hash                                 Exists FullName
 --------  --------                                 ------ --------
@@ -66,9 +67,9 @@ MyToolbox beffe458a0460726f79316fd0dad2d2392a35b64   True C:\PowdrgitExamples\My
 ```
 ## Pipe results from Get-GitLog ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitLog -NoMerges | Get-GitCommitFile | Format-Table -Property RepoName,SHA1Hash,Exists,FullName
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+PS C:\PowdrgitExamples\MyToolbox> Get-GitLog -NoMerges | Get-GitCommitFile | Format-Table -Property RepoName,SHA1Hash,Exists,FullName
 
 RepoName  SHA1Hash                                 Exists FullName
 --------  --------                                 ------ --------
@@ -81,16 +82,15 @@ MyToolbox 87b1320518c17702d30e463966bc070ce6481459  False
 
 ## PARAMETERS
 
-### -RepoName
-The name of the git repository to return.
-This should match the directory name of one of the repositories defined in the $GitRepoPath module variable.
-If there is no match, a warning is generated.
-When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+### -Repo
+The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+If the Repo parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+For examples of using the Repo parameter, refer to the help text for Get-GitRepo.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: RepoName, RepoPath
 
 Required: False
 Position: 1
@@ -130,21 +130,22 @@ Accepts string objects via the SHA1Hash parameter. The output of Get-GitLog and 
 
 Returns a custom GitCommitFile object. For details use Get-Member at a command prompt e.g.:
 
-`PS C:\PowdrgitExamples\MyToolbox> Get-GitCommitFile | Get-Member -MemberType Properties`
-
+PS C:\PowdrgitExamples\MyToolbox> Get-GitCommitFile | Get-Member -MemberType Properties
 
 ## NOTES
 Author : nmbell
 
 ## RELATED LINKS
 
-[about_powdrgit](about_powdrgit.md)
-
 [Get-GitCommit](Get-GitCommit.md)
 
 [Get-GitFileHistory](Get-GitFileHistory.md)
 
 [Get-GitLog](Get-GitLog.md)
+
+[Get-GitRepo](Get-GitRepo.md)
+
+[about_powdrgit](about_powdrgit.md)
 
 
 

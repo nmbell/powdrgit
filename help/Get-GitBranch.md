@@ -1,4 +1,4 @@
-﻿# Get-GitBranch
+# Get-GitBranch
 
 ## SYNOPSIS
 Gets a list of branches for the specified repository.
@@ -7,22 +7,22 @@ Gets a list of branches for the specified repository.
 
 ### Remote (Default)
 ```
-Get-GitBranch [[-RepoName] <String>] [-IncludeRemote] [-ExcludeLocal] [-SetLocation] [<CommonParameters>]
+Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-IncludeRemote] [-ExcludeLocal] [-SetLocation] [<CommonParameters>]
 ```
 
 ### Current
 ```
-Get-GitBranch [[-RepoName] <String>] [-Current] [-SetLocation] [<CommonParameters>]
+Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-Current] [-SetLocation] [<CommonParameters>]
 ```
 
 ### CurrentFirst
 ```
-Get-GitBranch [[-RepoName] <String>] [-CurrentFirst] [-IncludeRemote] [-SetLocation] [<CommonParameters>]
+Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-CurrentFirst] [-IncludeRemote] [-SetLocation] [<CommonParameters>]
 ```
 
 ### CurrentLast
 ```
-Get-GitBranch [[-RepoName] <String>] [-CurrentLast] [-IncludeRemote] [-SetLocation] [<CommonParameters>]
+Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-CurrentLast] [-IncludeRemote] [-SetLocation] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -35,27 +35,28 @@ By default, branches are returned in branch name (alphabetical) order, as they a
 ```
 ## Call from outside a repository without parameters ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 PS C:\> Get-GitBranch
 
-# Nothing was returned because a RepoName was not provided.
+# Nothing was returned because a Repo was not provided.
 ```
 
 ### EXAMPLE 2
 ```
 ## Call from outside a repository for non-existent repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Get-GitBranch -RepoName NonExistentRepo
-WARNING: [Get-GitBranch]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+PS C:\> Get-GitBranch -Repo NonExistentRepo
+WARNING: [Get-GitBranch]Repository 'NonExistentRepo' not found. Check the repository directory exists and has been added to the $Powdrgit.Path module variable.
 ```
 
 ### EXAMPLE 3
 ```
-## Call from outside a repository with RepoName parameter ##
+## Call from outside a repository with Repo parameter ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Get-GitBranch -RepoName MyToolbox | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Get-GitBranch -Repo MyToolbox | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 RepoName  BranchName IsCheckedOut IsRemote
 --------  ---------- ------------ --------
@@ -69,10 +70,10 @@ MyToolbox release           False    False
 
 ### EXAMPLE 4
 ```
-## Call from outside a repository with RepoName and SetLocation parameters ##
+## Call from outside a repository with Repo and SetLocation parameters ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Get-GitBranch -RepoName MyToolbox -SetLocation | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Get-GitBranch -Repo MyToolbox -SetLocation | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 RepoName  BranchName IsCheckedOut IsRemote
 --------  ---------- ------------ --------
@@ -81,17 +82,17 @@ MyToolbox feature3          False    False
 MyToolbox main               True    False
 MyToolbox release           False    False
 
-PS C:\PowdrgitExamples\MyToolbox\>
+PS C:\PowdrgitExamples\MyToolbox>
 
 # The branches were returned and the current location (reflected in the prompt) changed to the repository's top-level directory.
 ```
 
 ### EXAMPLE 5
 ```
-## Call from outside a repository with RepoName and IncludeRemote parameters ##
+## Call from outside a repository with Repo and IncludeRemote parameters ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Get-GitBranch -RepoName MyToolbox -IncludeRemote | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Get-GitBranch -Repo MyToolbox -IncludeRemote | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 RepoName  BranchName IsCheckedOut IsRemote
 --------  ---------- ------------ --------
@@ -106,10 +107,10 @@ MyToolbox feature2          False     True
 
 ### EXAMPLE 6
 ```
-## Call from outside a repository with RepoName, IncludeRemote and ExcludeLocal parameters ##
+## Call from outside a repository with Repo, IncludeRemote and ExcludeLocal parameters ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Get-GitBranch -RepoName MyToolbox -IncludeRemote -ExcludeLocal | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Get-GitBranch -Repo MyToolbox -IncludeRemote -ExcludeLocal | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 RepoName  BranchName IsCheckedOut IsRemote
 --------  ---------- ------------ --------
@@ -120,10 +121,10 @@ MyToolbox feature2          False     True
 
 ### EXAMPLE 7
 ```
-## Call from outside a repository with RepoName and ExcludeLocal parameters ##
+## Call from outside a repository with Repo and ExcludeLocal parameters ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Get-GitBranch -RepoName MyToolbox -ExcludeLocal
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Get-GitBranch -Repo MyToolbox -ExcludeLocal
 PS C:\>
 
 # Use of the ExcludeLocal switch without the IncludeRemote switch returns no results because the function returns only local branches by default.
@@ -131,9 +132,9 @@ PS C:\>
 
 ### EXAMPLE 8
 ```
-## Call from outside a repository with RepoName and ExcludeLocal parameters ##
+## Call from outside a repository with Repo and ExcludeLocal parameters ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 PS C:\> Get-GitRepo | Get-GitBranch | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 RepoName  BranchName IsCheckedOut IsRemote
@@ -152,9 +153,9 @@ Project1  newfeature         True    False
 ```
 ## Get all local branches of the current repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitRepo -RepoName MyToolbox # move to the repository directory
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitBranch | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitRepo -Repo MyToolbox # move to the repository directory
+PS C:\PowdrgitExamples\MyToolbox> Get-GitBranch | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 RepoName  BranchName IsCheckedOut IsRemote
 --------  ---------- ------------ --------
@@ -168,9 +169,9 @@ MyToolbox release           False    False
 ```
 ## Call with -CurrentFirst switch ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitRepo -RepoName MyToolbox # move to the repository directory
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitBranch -CurrentFirst | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitRepo -Repo MyToolbox # move to the repository directory
+PS C:\PowdrgitExamples\MyToolbox> Get-GitBranch -CurrentFirst | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 RepoName  BranchName IsCheckedOut IsRemote
 --------  ---------- ------------ --------
@@ -187,9 +188,9 @@ MyToolbox release           False    False
 ```
 ## Call with -CurrentLast switch ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitRepo -RepoName MyToolbox # move to the repository directory
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitBranch -CurrentLast | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitRepo -Repo MyToolbox # move to the repository directory
+PS C:\PowdrgitExamples\MyToolbox> Get-GitBranch -CurrentLast | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 RepoName  BranchName IsCheckedOut IsRemote
 --------  ---------- ------------ --------
@@ -206,9 +207,9 @@ MyToolbox main               True    False
 ```
 ## Call with -Current switch ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitRepo -RepoName MyToolbox # move to the repository directory
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitBranch -Current | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitRepo -Repo MyToolbox # move to the repository directory
+PS C:\PowdrgitExamples\MyToolbox> Get-GitBranch -Current | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 RepoName  BranchName IsCheckedOut IsRemote
 --------  ---------- ------------ --------
@@ -217,10 +218,44 @@ MyToolbox main               True    False
 # The Current switch caused only the checked out branch to be returned.
 ```
 
+### EXAMPLE 13
+```
+## Call with Repo value matching multiple repositories ##
+
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+PS C:\> Get-GitBranch -Repo PowdrgitExamples -BranchName *feature* | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote,RepoPath
+WARNING: [Get-GitBranch]Repo argument 'PowdrgitExamples' matched multiple repositories. Please confirm any results or actions are as expected.
+
+RepoName  BranchName IsCheckedOut IsRemote RepoPath
+--------  ---------- ------------ -------- --------
+MyToolbox feature1          False    False C:\PowdrgitExamples\MyToolbox
+MyToolbox feature3          False    False C:\PowdrgitExamples\MyToolbox
+Project1  newfeature         True    False C:\PowdrgitExamples\Project1
+```
+
 ## PARAMETERS
 
+### -BranchName
+The names of the branches to be checked out.
+Wildcard characters are allowed.
+The pattern will match against existing branches in the specified repository.
+A warning will be generated for any values that do not match the name of an existing branch.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 2
+Default value: *
+Accept pipeline input: True (ByPropertyName)
+Accept wildcard characters: False
+```
+
 ### -Current
-Limits the results to the current branch of the specified repository; otherwise, all branch names will be returned.
+Limits the results to the current branch of the specified repository; otherwise, all matching branch names will be returned.
 
 ```yaml
 Type: SwitchParameter
@@ -296,27 +331,26 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RepoName
-The name of the git repository to return.
-This should match the directory name of one of the repositories defined in the $GitRepoPath module variable.
-If there is no match, a warning is generated.
-When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+### -Repo
+The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+If the Repo parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+For examples of using the Repo parameter, refer to the help text for Get-GitRepo.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: RepoName, RepoPath
 
 Required: False
 Position: 1
 Default value: None
-Accept pipeline input: True (ByPropertyName, ByValue)
+Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -SetLocation
 Sets the working directory to the top-level directory of the specified repository.
-In the case where multiple RepoName values are passed in, the location will reflect the repository that was specified last.
+In the case where multiple Repo values are passed in, the location will reflect the repository that was specified last.
 
 ```yaml
 Type: SwitchParameter
@@ -337,7 +371,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 [System.String]
 
-Accepts string objects via the RepoName parameter. The output of Get-GitRepo can be piped into Get-GitBranch.
+Accepts string objects via the Repo parameter. The output of Get-GitRepo can be piped into Get-GitBranch.
 
 ## OUTPUTS
 
@@ -345,19 +379,22 @@ Accepts string objects via the RepoName parameter. The output of Get-GitRepo can
 
 Returns a custom GitBranch object. For details use Get-Member at a command prompt e.g.:
 
-`PS C:\PowdrgitExamples\MyToolbox> Get-GitBranch | Get-Member -MemberType Properties`
-
+PS C:\PowdrgitExamples\MyToolbox> Get-GitBranch | Get-Member -MemberType Properties
 
 ## NOTES
 Author : nmbell
 
 ## RELATED LINKS
 
-[about_powdrgit](about_powdrgit.md)
+[Set-GitBranch](Set-GitBranch.md)
 
 [Get-GitRepo](Get-GitRepo.md)
 
-[Set-GitBranch](Set-GitBranch.md)
+[Get-GitLog](Get-GitLog.md)
+
+[Get-GitTag](Get-GitTag.md)
+
+[about_powdrgit](about_powdrgit.md)
 
 
 

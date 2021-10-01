@@ -20,6 +20,7 @@ function Test-SubPath
 
 	.EXAMPLE
 	## Test paths as strings ##
+
 	PS C:\> $childPath  = 'C:\NonExistentFolder\NonExistentFile.txt'
 	PS C:\> $parentPath = 'C:\NonExistentFolder'
 	PS C:\> Test-SubPath -ChildPath $childPath -ParentPath $parentPath
@@ -29,6 +30,7 @@ function Test-SubPath
 
 	.EXAMPLE
 	## Test paths as strings ##
+
 	PS C:\> $childPath  = 'C:\NonExistentFolder\NonExistentFile.txt'
 	PS C:\> $parentPath = 'C:\NonExistent'
 	PS C:\> Test-SubPath -ChildPath $childPath -ParentPath $parentPath
@@ -38,6 +40,7 @@ function Test-SubPath
 
 	.EXAMPLE
 	## Test paths as strings and check existence ##
+
 	PS C:\> $childPath  = 'C:\NonExistentFolder\NonExistentFile.txt'
 	PS C:\> $parentPath = 'C:\NonExistentFolder'
 	PS C:\> Test-SubPath -ChildPath $childPath -ParentPath $parentPath -Physical
@@ -47,6 +50,7 @@ function Test-SubPath
 
 	.EXAMPLE
 	## Test paths as strings and check existence ##
+
 	PS C:\> $childPath  = $Env:HOME
 	PS C:\> $parentPath = "$Env:HOMEDRIVE\"
 	PS C:\> Test-SubPath -ChildPath $childPath -ParentPath $parentPath -Physical
@@ -62,59 +66,64 @@ function Test-SubPath
 	[System.Boolean]
 	Returns a boolean (true/false) object.
 
-
 	.NOTES
 	Author : nmbell
+
+	.LINK
+	Test-PowdrgitPath
+	.LINK
+	about_powdrgit
 	#>
 
-    # Use cmdlet binding
-    [CmdletBinding()]
+	# Use cmdlet binding
+	[CmdletBinding()]
 
-    # Declare parameters
+	# Declare parameters
 	Param
 	(
 
 
 		[Parameter(
-      	  Mandatory                       = $false
-      	, Position                        = 0
-      	, ValueFromPipeline               = $true
-      	, ValueFromPipelineByPropertyName = $true
-      	)]
+	  	  Mandatory                       = $false
+	  	, Position                        = 0
+	  	, ValueFromPipeline               = $true
+	  	, ValueFromPipelineByPropertyName = $true
+	  	)]
 		[Alias('FullName','Path')]
 		[String]
 		$ChildPath
 
-    ,	[Parameter(
-      	  Mandatory                       = $false
-      	, Position                        = 1
-      	, ValueFromPipeline               = $false
-      	, ValueFromPipelineByPropertyName = $true
-      	)]
+	,	[Parameter(
+	  	  Mandatory                       = $false
+	  	, Position                        = 1
+	  	, ValueFromPipeline               = $false
+	  	, ValueFromPipelineByPropertyName = $true
+	  	)]
 		[String]
 		$ParentPath
 
-    ,	[Switch]
+	,	[Switch]
 		$Physical
-    )
+	)
 
 	BEGIN
 	{
-		# $wvBlock          = 'B'
+		$bk = 'B'
 
 		# Common BEGIN:
-		Set-StrictMode -Version 2.0
-		# $thisFunctionName = $MyInvocation.InvocationName
-		# $start            = Get-Date
-		# $wvIndent         = '|  '*($PowdrgitCallDepth++)
-		# Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
+		Set-StrictMode -Version 3.0
+		$thisFunctionName = $MyInvocation.MyCommand
+		$start            = Get-Date
+		$indent           = ($Powdrgit.DebugIndentChar[0]+'   ')*($PowdrgitCallDepth++)
+		$PSDefaultParameterValues += @{ '*:Verbose' = $(If ($DebugPreference -notin 'Ignore','SilentlyContinue') { $DebugPreference } Else { $VerbosePreference }) } # turn on Verbose with Debug
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
 
 		# Function BEGIN:
 	}
 
 	PROCESS
 	{
-		# $wvBlock = 'P'
+		# $bk = 'P'
 
 		$result = $false
 
@@ -139,18 +148,18 @@ function Test-SubPath
 		}
 
 		Write-Output $result
-    }
+	}
 
 	END
 	{
-		# $wvBlock = 'E'
+		$bk = 'E'
 
 		# Function END:
 
 		# Common END:
-		# $end      = Get-Date
-		# $duration = New-TimeSpan -Start $start -End $end
-		# Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($('{0}d {1:00}:{2:00}:{3:00}.{4:000}' -f $duration.Days,$duration.Hours,$duration.Minutes,$duration.Seconds,$duration.Milliseconds))"
-		# $PowdrgitCallDepth--
+		$end      = Get-Date
+		$duration = New-TimeSpan -Start $start -End $end
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($($duration.ToString('d\d\ hh\:mm\:ss\.fff')))"
+		$PowdrgitCallDepth--
 	}
 }

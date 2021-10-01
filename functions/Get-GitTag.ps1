@@ -8,31 +8,32 @@ function Get-GitTag
 	Gets a list of tags for the specified repository.
 	By default, tags are returned in tag name (alphabetical) order.
 
-	.PARAMETER RepoName
-	The name of the git repository to return.
-	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
-	When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+	.PARAMETER Repo
+	The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+	If the Repo parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+	For examples of using the Repo parameter, refer to the help text for Get-GitRepo.
 
 	.EXAMPLE
 	## Call from outside a repository without parameters ##
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitTag
 	PS C:\>
 
-	# Nothing was returned because a RepoName was not provided.
+	# Nothing was returned because a Repo was not provided.
 
 	.EXAMPLE
 	## Call from outside a repository for non-existent repository ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Get-GitTag -RepoName NonExistentRepo
-	WARNING: [Get-GitTag]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+	PS C:\> Get-GitTag -Repo NonExistentRepo
+	WARNING: [Get-GitTag]Repository 'NonExistentRepo' not found. Check the repository directory exists and has been added to the $Powdrgit.Path module variable.
 
 	.EXAMPLE
-	## Call from outside a repository with RepoName parameter ##
+	## Call from outside a repository with Repo parameter ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Get-GitTag -RepoName MyToolbox | Format-Table -Property RepoName,TagName,TagType,TagSubject
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitTag -Repo MyToolbox | Format-Table -Property RepoName,TagName,TagType,TagSubject
 
 	RepoName  TagName        TagType TagSubject
 	--------  -------        ------- ----------
@@ -44,8 +45,8 @@ function Get-GitTag
 	.EXAMPLE
 	## Get all tags of the current repository ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitRepo -RepoName MyToolbox
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitRepo -Repo MyToolbox
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitTag | Format-Table -Property RepoName,TagName,TagType,TagSubject
 
 	RepoName  TagName        TagType TagSubject
@@ -53,9 +54,21 @@ function Get-GitTag
 	MyToolbox annotatedTag   tag     This is an annotated tag
 	MyToolbox lightweightTag commit  feature1 commit
 
+	.EXAMPLE
+	## Pipe results from Get-GitRepo ##
+
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitRepo | Get-GitTag | Format-Table -Property RepoName,TagName,TagType,TagSubject
+
+	RepoName  TagName        TagType TagSubject
+	--------  -------        ------- ----------
+	MyToolbox annotatedTag   tag     This is an annotated tag
+	MyToolbox lightweightTag commit  feature1 commit
+	Project1  lightweightTag commit  Initial commit
+
 	.INPUTS
 	[System.String]
-	Accepts string objects via the RepoName parameter. The output of Get-GitRepo can be piped into Get-GitTag.
+	Accepts string objects via the Repo parameter. The output of Get-GitRepo can be piped into Get-GitTag.
 
 	.OUTPUTS
 	[GitTag]
@@ -66,53 +79,56 @@ function Get-GitTag
 	Author : nmbell
 
 	.LINK
-	about_powdrgit
+	Get-GitCommit
+	.LINK
+	Get-GitLog
 	.LINK
 	Get-GitBranch
 	.LINK
 	Get-GitRepo
+	.LINK
+	about_powdrgit
 	#>
 
-    # Use cmdlet binding
-    [CmdletBinding(
+	# Function alias
+	[Alias('ggt')]
+
+	# Use cmdlet binding
+	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitTag.md'
 	)]
 
-    # Declare parameters
-    Param(
+	# Declare parameters
+	Param(
 
-    	[Parameter(
-    	  Mandatory                       = $false
-    	, Position                        = 0
-    	, ValueFromPipeline               = $true
-    	, ValueFromPipelineByPropertyName = $true
+		[Parameter(
+		  Mandatory                       = $false
+		, Position                        = 0
+		, ValueFromPipeline               = $true
+		, ValueFromPipelineByPropertyName = $true
 		)]
-		[ArgumentCompleter({
-			Param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
-			Get-GitRepo -Verbose:$false `
-				| Select-Object -ExpandProperty RepoName `
-				| Where-Object { $_ -like "$wordToComplete*" } `
-				| Sort-Object
-		})]
-		[String]
-		$RepoName
+	#	[ArgumentCompleter()]
+		[Alias('RepoName','RepoPath')]
+		[String[]]
+		$Repo
 
-    )
+	)
 
 	BEGIN
 	{
-		$wvBlock          = 'B'
+		$bk = 'B'
 
 		# Common BEGIN:
-		Set-StrictMode -Version 2.0
-		$thisFunctionName = $MyInvocation.InvocationName
+		Set-StrictMode -Version 3.0
+		$thisFunctionName = $MyInvocation.MyCommand
 		$start            = Get-Date
-		$wvIndent         = '|  '*($PowdrgitCallDepth++)
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
+		$indent           = ($Powdrgit.DebugIndentChar[0]+'   ')*($PowdrgitCallDepth++)
+		$PSDefaultParameterValues += @{ '*:Verbose' = $(If ($DebugPreference -notin 'Ignore','SilentlyContinue') { $DebugPreference } Else { $VerbosePreference }) } # turn on Verbose with Debug
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
 
 		# Function BEGIN:
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finding current location"
-		Push-Location -StackName GetGitTag
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finding current location"
+		$startLocation = $PWD.Path
 
 		$startOfText = '!!>>' # commit info delimiter
 		$endOfText   = '<<!!' # commit info delimiter
@@ -120,20 +136,27 @@ function Get-GitTag
 
 	PROCESS
 	{
-		$wvBlock = 'P'
+		$bk = 'P'
 
 		# Find the repository name from current location
-		If (!$RepoName) { $RepoName = Get-GitRepo -Current | Select-Object -ExpandProperty RepoName }
+		If (!$PSBoundParameters.ContainsKey('Repo')) { $Repo = Get-GitRepo -Current | Select-Object -ExpandProperty RepoPath }
 
-		# Go to the repository and get the repository info
-		$repo = Set-GitRepo -RepoName $RepoName -PassThru -WarningAction SilentlyContinue
+		# Get the repository info
+		$validRepos = Get-ValidRepo -Repo $Repo
 
-		If ($repo)
+		# Get the tags
+		ForEach ($validRepo in $validRepos)
 		{
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finding tags"
+			# Go to the repository and get the repository info
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Moving to the repository directory: $($validRepo.RepoPath)"
+			Set-GitRepo -Repo $validRepo.RepoPath -WarningAction Ignore
+
+			# Get tag info
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finding tags"
 			$gitCommand = 'git for-each-ref "refs/tags" --format="'+$startOfText+'%(*objectname)|%(objectname)|%(refname)|%(objecttype)|%(subject)|%(body)|%(taggerdate:iso8601-strict-local)|%(taggername)|%(taggeremail:trim)'+$endOfText+'"' # https://git-scm.com/docs/git-for-each-ref#_field_names
 			$gitResults = Invoke-GitExpression -Command $gitCommand -SuppressGitErrorStream `
-							| ConvertTo-GitParsableResults -StartOfText $startOfText -EndOfText $endOfText
+						  | ConvertTo-GitParsableResults -StartOfText $startOfText -EndOfText $endOfText
+			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found tags: $('{0,3}' -f ($gitResults | Measure-Object).Count)"
 
 			ForEach ($line in $gitResults | Where-Object { $_.Trim() })
 			{
@@ -145,7 +168,8 @@ function Get-GitTag
 
 				# Output
 				[GitTag]@{
-					'RepoName'    = $repo.Name
+					'RepoName'    = $validRepo.RepoName
+					'RepoPath'    = $validRepo.RepoPath
 					'SHA1Hash'    = $sha1Hash
 					'TagHash'     = $lineSplit[1]
 					'TagName'     = $tagName
@@ -159,24 +183,20 @@ function Get-GitTag
 				}
 			}
 		}
-		ElseIf ($RepoName)
-		{
-			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
-		}
-    }
+	}
 
 	END
 	{
-		$wvBlock = 'E'
+		$bk = 'E'
 
 		# Function END:
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting location to original directory"
-		Pop-Location -StackName GetGitTag
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Setting location to original directory"
+		Set-Location -Path $startLocation
 
 		# Common END:
 		$end      = Get-Date
 		$duration = New-TimeSpan -Start $start -End $end
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($('{0}d {1:00}:{2:00}:{3:00}.{4:000}' -f $duration.Days,$duration.Hours,$duration.Minutes,$duration.Seconds,$duration.Milliseconds))"
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($($duration.ToString('d\d\ hh\:mm\:ss\.fff')))"
 		$PowdrgitCallDepth--
 	}
 }

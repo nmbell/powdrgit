@@ -2,19 +2,20 @@ function Get-GitRepo
 {
 	<#
 	.SYNOPSIS
-	Gets the directory objects for valid repositories defined in the $GitRepoPath module variable.
+	Gets the directory objects for valid repositories defined in the $Powdrgit.Path module variable.
 
 	.DESCRIPTION
-	Gets the directory objects for valid repositories defined in the $GitRepoPath module variable.
+	Gets the directory objects for valid repositories defined in the $Powdrgit.Path module variable.
 
-	.PARAMETER RepoName
-	The name of the git repository to return.
-	The powdrgit module always takes the name of the top-level repository directory as the repository name. It does not use values from a repository's config or origin URL as the name.
-	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, nothing will be returned.
-	When the parameter is omitted, all valid repositories will be returned.
-
-	.PARAMETER Path
-	The path of a git repository directory or any of its subdirectories or files.
+	.PARAMETER Repo
+	The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+	The value passed in is matched against the directory paths defined in the $Powdrgit.Path module variable:
+	  - If the value is an exact match to any repository names or paths, only those repositories will be returned.
+	  - If there are no exact matches but the value is a partial match to any repository paths, those repositories will be returned.
+	  - If there are no exact or partial matches, nothing will be returned.
+	  - If the value is $null or an empty\whitespace string, nothing will be returned.
+	If the Repo parameter is omitted, all valid repositories will be returned.
+	When using tab completion, if a repository name is unique, only the name will be displayed, otherwise the full directory path is displayed. To force autocompletion to always show the full path, set $Powdrgit.AutoCompleteFullPaths = $true. Tab completion values will match on a repository name or path.
 
 	.PARAMETER Current
 	Limits the results to the current git repository.
@@ -22,101 +23,127 @@ function Get-GitRepo
 	Will return the current repository when the working directory is either the repository directory or any of its subdirectories.
 
 	.EXAMPLE
-	## Get all valid repositories defined in the $GitRepoPath module variable ##
+	## Get all valid repositories defined in the $Powdrgit.Path module variable ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitRepo | Select-Object -ExpandProperty RepoName
 	MyToolbox
 	Project1
 
 	.EXAMPLE
-	## Get the repository by RepoName ##
+	## Get the repository by name ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Get-GitRepo -RepoName MyToolBox | Select-Object -ExpandProperty RepoName
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitRepo -Repo MyToolBox | Select-Object -ExpandProperty RepoName
 	MyToolbox
 
 	.EXAMPLE
-	## Get the repository by Path ##
+	## Get the repository by directory path ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Get-GitRepo -Path 'C:\PowdrgitExamples\MyToolbox' | Select-Object -ExpandProperty RepoName
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitRepo -Repo 'C:\PowdrgitExamples\MyToolbox' | Select-Object -ExpandProperty RepoName
 	MyToolbox
+
+	.EXAMPLE
+	## Get the repository by partial match ##
+
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitRepo -Repo 'Examples\MyTool' | Select-Object -ExpandProperty RepoName
+	MyToolbox
+
+	.EXAMPLE
+	## Get the repository by file path ##
+
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitRepo -Repo 'C:\PowdrgitExamples\MyToolbox\feature1_File1.txt' | Select-Object -ExpandProperty RepoName
+	MyToolbox
+
+	.EXAMPLE
+	## Get the repository from multiple inputs ##
+
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitRepo -Repo 'Examples\MyTool','Project1' | Select-Object -ExpandProperty RepoName
+	Project1
+	MyToolbox
+
+	# Both the partial match and exact match were returned
 
 	.EXAMPLE
 	## Get the current repository ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitRepo -Current
 	PS C:\>
 
 	# Nothing was returned because the current location is not inside a repository.
 
-	PS C:\> Set-GitRepo -RepoName MyToolbox # move to the repository directory
+	PS C:\> Set-GitRepo -Repo MyToolbox # move to the repository directory
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitRepo -Current | Select-Object -ExpandProperty RepoName
 	MyToolbox
 
 	# This time the repository name is returned because we were inside a repository.
 
+	.EXAMPLE
+	## Pass $null to the Repo parameter ##
+
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitRepo -Repo $null
+	PS C:\>
+
 	.INPUTS
 	[System.String]
-	Accepts string objects via the RepoName parameter.
+	Accepts string objects via the Repo parameter.
 
 	.OUTPUTS
-	[System.IO.DirectoryInfo] (extended)
-	Returns directory objects extended with a RepoName (String) alias property.
+	[GitRepo]
+	Returns a custom GitRepo object. The DirectoryInfo property contains the filesystem directory object for the repository.
 
 	.NOTES
 	Author : nmbell
 
 	.LINK
-	about_powdrgit
-	.LINK
 	Find-GitRepo
 	.LINK
 	Set-GitRepo
 	.LINK
-	Test-GitRepoPath
+	New-GitRepo
+	.LINK
+	Remove-GitRepo
+	.LINK
+	Invoke-GitClone
+	.LINK
+	Add-PowdrgitPath
+	.LINK
+	Remove-PowdrgitPath
+	.LINK
+	Test-PowdrgitPath
+	.LINK
+	about_powdrgit
 	#>
 
-    # Use cmdlet binding
+	# Function alias
+	[Alias('ggr')]
+
+	# Use cmdlet binding
 	[CmdletBinding(
-	  DefaultParameterSetName = 'RepoName'
+	  DefaultParameterSetName = 'Repo'
 	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitRepo.md'
 	)]
 
-    # Declare parameters
-    Param(
+	# Declare parameters
+	Param(
 
 		[Parameter(
-		  ParameterSetName                = 'RepoName'
-		, Mandatory                       = $false
+		  Mandatory                       = $false
 		, Position                        = 0
-		, ValueFromPipeline               = $true
+		, ValueFromPipeline               = $false
 		, ValueFromPipelineByPropertyName = $true
+		, ParameterSetName                = 'Repo'
 		)]
-		[ArgumentCompleter({
-			Param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
-			Get-GitRepo -Verbose:$false `
-				| Select-Object -ExpandProperty RepoName `
-				| Where-Object { $_ -like "$wordToComplete*" } `
-				| Sort-Object
-		})]
-		[String]
-		$RepoName
-
-	,	[Parameter(ParameterSetName = 'Path')]
-		[ArgumentCompleter({
-			Param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
-			Get-GitRepo -Verbose:$false `
-				| Select-Object @{ n = 'QuotedFullName'; e = { "'"+$_.FullName+"'" } } `
-				| Select-Object -ExpandProperty QuotedFullName `
-				| Where-Object { $_ -like "$wordToComplete*" } `
-				| Sort-Object
-		})]
-		[Alias('FullName')]
-		[String]
-		$Path
+	#	[ArgumentCompleter()]
+		[Alias('RepoName','RepoPath')]
+		[String[]]
+		$Repo
 
 	,	[Parameter(ParameterSetName = 'Current')]
 		[Switch]
@@ -126,63 +153,144 @@ function Get-GitRepo
 
 	BEGIN
 	{
-		$wvBlock          = 'B'
+		$bk = 'B'
 
 		# Common BEGIN:
-		Set-StrictMode -Version 2.0
-		$thisFunctionName = $MyInvocation.InvocationName
+		Set-StrictMode -Version 3.0
+		$thisFunctionName = $MyInvocation.MyCommand
 		$start            = Get-Date
-		$wvIndent         = '|  '*($PowdrgitCallDepth++)
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
+		$indent           = ($Powdrgit.DebugIndentChar[0]+'   ')*($PowdrgitCallDepth++)
+		$PSDefaultParameterValues += @{ '*:Verbose' = $(If ($DebugPreference -notin 'Ignore','SilentlyContinue') { $DebugPreference } Else { $VerbosePreference }) } # turn on Verbose with Debug
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
 
 		# Function BEGIN:
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finding current location"
-		Push-Location -StackName GetGitRepo
+		$outputPaths = @()
+
+		# Get list of all valid repository paths
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Getting list of repositories from the `$Powdrgit.Path module variable:"
+		$allRepoPaths = Test-PowdrgitPath -PassThru -WarningAction Ignore
+		# $allRepoPaths | ForEach-Object { Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]    $_" }
+
+		# Group paths by repository name
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Grouping paths by repository name"
+		$repoGroups = $allRepoPaths `
+					  | Select-Object @{ n = 'RepoPath'; e = { $_ } },@{ n = 'RepoName'; e = { (Split-Path -Path $_ -Leaf) } } `
+					  | Group-Object -Property RepoName
 	}
 
 	PROCESS
 	{
-		$wvBlock = 'P'
+		$bk = 'P'
 
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Getting list of repositories from the `$GitRepoPath module variable"
-		ForEach ($repoPath in (Test-GitRepoPath -PassThru -NoWarn)) # suppress warning output here
+		# Keep track of which items in Repo have been matched: +ve for exact matches, -ve for partial matches
+		$RepoHash = @{}
+		$Repo | Select-Object -Unique | ForEach-Object { $RepoHash.$_ = 0 }
+
+		# Get exact name matches
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Getting exact matches on repository name:"
+		ForEach ($repoGroup in $repoGroups)
 		{
-			Get-Item -Path $repoPath -ErrorAction SilentlyContinue `
-				| Where-Object { Test-Path -Path "$repoPath\.git" } `
-				| Where-Object {
-					If ($Current)
-					{
-						Get-Location -StackName GetGitRepo | Test-SubPath -ParentPath $_.FullName
-					}
-					ElseIf ($Path)
-					{
-						Test-SubPath -ParentPath $_.FullName -ChildPath $Path
-					}
-					ElseIf ($RepoName)
-					{
-						$_.Name -eq $RepoName
-					}
-					ElseIf (!$PSBoundParameters.ContainsKey('RepoName'))
-					{
-						$true
-					}
-				} `
-				| ForEach-Object { Add-Member -InputObject $_ -MemberType AliasProperty -Name RepoName -Value Name -PassThru }
+			If ($repoGroup.Name -in $RepoHash.Keys)
+			{
+				ForEach ($repoGroupPath in $repoGroup.Group.RepoPath)
+				{
+					$outputPaths += $repoGroupPath
+					# Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]  $repoGroupPath"
+				}
+				$RepoHash.$($repoGroup.Name) = $repoGroup.Count
+			}
 		}
-    }
+
+		# Get exact path matches
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Getting exact matches on repository path:"
+		ForEach ($repoPath in $allRepoPaths)
+		{
+			If ($repoPath -in $RepoHash.Keys)
+			{
+				$RepoHash.$repoPath = 1
+				$outputPaths += $repoPath
+				# Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]  $repoPath"
+			}
+		}
+
+		# Get like path matches
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Getting like matches on repository path:"
+		ForEach ($repoPath in $allRepoPaths)
+		{
+			If ($Current)
+			{
+				If (Test-SubPath -ParentPath $repoPath -ChildPath $PWD.Path)
+				{
+					$outputPaths += $repoPath
+					# Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]  $repoPath"
+				}
+			}
+			ElseIf ($PSBoundParameters.ContainsKey('Repo'))
+			{
+				ForEach ($_Repo in $RepoHash.Keys | Where-Object { $RepoHash.$_ -le 0 })
+				{
+					$isPathMatch = $false
+					If ([String]::IsNullOrWhiteSpace($_Repo))
+					{
+						$isPathMatch = $isPathMatch -or $false
+					}
+					ElseIf ($repoPath -like "*$_Repo*")
+					{
+						$isPathMatch = $isPathMatch -or $true
+					}
+					ElseIf ($_Repo)
+					{
+						$isPathMatch = $isPathMatch -or (Test-SubPath -ParentPath $repoPath -ChildPath $_Repo)
+					}
+					If ($isPathMatch)
+					{
+						$RepoHash.$_Repo -= 1
+						$outputPaths += $repoPath
+						# Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]  $repoPath"
+					}
+				}
+			}
+			Else
+			{
+				$outputPaths += $repoPath
+				# Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]  $repoPath"
+			}
+		}
+
+		# Output the matching repositories
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Outputting the matching repositories"
+		ForEach ($outputPath in $outputPaths | Select-Object -Unique)
+		{
+			Get-Item -Path $outputPath -ErrorAction Ignore `
+			| ForEach-Object {
+				[GitRepo]@{
+					'RepoName'      = $_.Name
+					'RepoPath'      = $_.FullName
+					'DirectoryInfo' = $_
+					'IsNameUnique'  = $(($repoGroups | Where-Object Name -eq $_.Name).Count -eq 1)
+					'IsBare'        = $($_.Name -like '*.git')
+				}
+			}
+		}
+		Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found matching repositories: $('{0,3}' -f $outputPaths.Count)"
+
+		# Output the match counts if necessary
+		If ($PSBoundParameters.ContainsKey('InformationVariable'))
+		{
+			Write-Information -MessageData $RepoHash -Tags 'f6c9c6f3-11e4-49d7-abff-5d26c0b37160'
+		}
+	}
 
 	END
 	{
-		$wvBlock = 'E'
+		$bk = 'E'
 
 		# Function END:
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting location to original directory"
-		Pop-Location -StackName GetGitRepo
 
 		# Common END:
 		$end      = Get-Date
 		$duration = New-TimeSpan -Start $start -End $end
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($('{0}d {1:00}:{2:00}:{3:00}.{4:000}' -f $duration.Days,$duration.Hours,$duration.Minutes,$duration.Seconds,$duration.Milliseconds))"
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($($duration.ToString('d\d\ hh\:mm\:ss\.fff')))"
 		$PowdrgitCallDepth--
 	}
 }

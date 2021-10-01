@@ -8,13 +8,18 @@ function Get-GitBranch
 	Gets a list of branches for the specified repository.
 	By default, branches are returned in branch name (alphabetical) order, as they are with native git commands.
 
-	.PARAMETER RepoName
-	The name of the git repository to return.
-	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
-	When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+	.PARAMETER Repo
+	The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+	If the Repo parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+	For examples of using the Repo parameter, refer to the help text for Get-GitRepo.
+
+	.PARAMETER BranchName
+	The names of the branches to be checked out.
+	Wildcard characters are allowed. The pattern will match against existing branches in the specified repository.
+	A warning will be generated for any values that do not match the name of an existing branch.
 
 	.PARAMETER Current
-	Limits the results to the current branch of the specified repository; otherwise, all branch names will be returned.
+	Limits the results to the current branch of the specified repository; otherwise, all matching branch names will be returned.
 
 	.PARAMETER CurrentFirst
 	Forces the current branch to be the first returned item.
@@ -32,28 +37,29 @@ function Get-GitBranch
 
 	.PARAMETER SetLocation
 	Sets the working directory to the top-level directory of the specified repository.
-	In the case where multiple RepoName values are passed in, the location will reflect the repository that was specified last.
+	In the case where multiple Repo values are passed in, the location will reflect the repository that was specified last.
 
 	.EXAMPLE
 	## Call from outside a repository without parameters ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitBranch
 
-	# Nothing was returned because a RepoName was not provided.
+	# Nothing was returned because a Repo was not provided.
 
 	.EXAMPLE
 	## Call from outside a repository for non-existent repository ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Get-GitBranch -RepoName NonExistentRepo
-	WARNING: [Get-GitBranch]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+	PS C:\> Get-GitBranch -Repo NonExistentRepo
+	WARNING: [Get-GitBranch]Repository 'NonExistentRepo' not found. Check the repository directory exists and has been added to the $Powdrgit.Path module variable.
 
 	.EXAMPLE
-	## Call from outside a repository with RepoName parameter ##
+	## Call from outside a repository with Repo parameter ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Get-GitBranch -RepoName MyToolbox | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitBranch -Repo MyToolbox | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 	RepoName  BranchName IsCheckedOut IsRemote
 	--------  ---------- ------------ --------
@@ -65,10 +71,10 @@ function Get-GitBranch
 	# The branches were returned even though the command was issued from outside the repository directory.
 
 	.EXAMPLE
-	## Call from outside a repository with RepoName and SetLocation parameters ##
+	## Call from outside a repository with Repo and SetLocation parameters ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Get-GitBranch -RepoName MyToolbox -SetLocation | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitBranch -Repo MyToolbox -SetLocation | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 	RepoName  BranchName IsCheckedOut IsRemote
 	--------  ---------- ------------ --------
@@ -82,10 +88,10 @@ function Get-GitBranch
 	# The branches were returned and the current location (reflected in the prompt) changed to the repository's top-level directory.
 
 	.EXAMPLE
-	## Call from outside a repository with RepoName and IncludeRemote parameters ##
+	## Call from outside a repository with Repo and IncludeRemote parameters ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Get-GitBranch -RepoName MyToolbox -IncludeRemote | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitBranch -Repo MyToolbox -IncludeRemote | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 	RepoName  BranchName IsCheckedOut IsRemote
 	--------  ---------- ------------ --------
@@ -98,10 +104,10 @@ function Get-GitBranch
 	# Remote branches were also included in the results. Note that remotes that are also the upstream of a local branch are omitted.
 
 	.EXAMPLE
-	## Call from outside a repository with RepoName, IncludeRemote and ExcludeLocal parameters ##
+	## Call from outside a repository with Repo, IncludeRemote and ExcludeLocal parameters ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Get-GitBranch -RepoName MyToolbox -IncludeRemote -ExcludeLocal | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitBranch -Repo MyToolbox -IncludeRemote -ExcludeLocal | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 	RepoName  BranchName IsCheckedOut IsRemote
 	--------  ---------- ------------ --------
@@ -110,18 +116,18 @@ function Get-GitBranch
 	# Only remote branches were included in the results. Note that remotes that are also the upstream of a local branch are omitted.
 
 	.EXAMPLE
-	## Call from outside a repository with RepoName and ExcludeLocal parameters ##
+	## Call from outside a repository with Repo and ExcludeLocal parameters ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Get-GitBranch -RepoName MyToolbox -ExcludeLocal
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Get-GitBranch -Repo MyToolbox -ExcludeLocal
 	PS C:\>
 
 	# Use of the ExcludeLocal switch without the IncludeRemote switch returns no results because the function returns only local branches by default.
 
 	.EXAMPLE
-	## Call from outside a repository with RepoName and ExcludeLocal parameters ##
+	## Call from outside a repository with Repo and ExcludeLocal parameters ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitRepo | Get-GitBranch | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 	RepoName  BranchName IsCheckedOut IsRemote
@@ -138,8 +144,8 @@ function Get-GitBranch
 	.EXAMPLE
 	## Get all local branches of the current repository ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitRepo -RepoName MyToolbox # move to the repository directory
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitRepo -Repo MyToolbox # move to the repository directory
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitBranch | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 	RepoName  BranchName IsCheckedOut IsRemote
@@ -152,8 +158,8 @@ function Get-GitBranch
 	.EXAMPLE
 	## Call with -CurrentFirst switch ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitRepo -RepoName MyToolbox # move to the repository directory
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitRepo -Repo MyToolbox # move to the repository directory
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitBranch -CurrentFirst | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 	RepoName  BranchName IsCheckedOut IsRemote
@@ -169,8 +175,8 @@ function Get-GitBranch
 	.EXAMPLE
 	## Call with -CurrentLast switch ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitRepo -RepoName MyToolbox # move to the repository directory
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitRepo -Repo MyToolbox # move to the repository directory
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitBranch -CurrentLast | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 	RepoName  BranchName IsCheckedOut IsRemote
@@ -186,8 +192,8 @@ function Get-GitBranch
 	.EXAMPLE
 	## Call with -Current switch ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitRepo -RepoName MyToolbox # move to the repository directory
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitRepo -Repo MyToolbox # move to the repository directory
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitBranch -Current | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 	RepoName  BranchName IsCheckedOut IsRemote
@@ -196,9 +202,23 @@ function Get-GitBranch
 
 	# The Current switch caused only the checked out branch to be returned.
 
+	.EXAMPLE
+	## Call with Repo value matching multiple repositories ##
+
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+	PS C:\> Get-GitBranch -Repo PowdrgitExamples -BranchName *feature* | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote,RepoPath
+	WARNING: [Get-GitBranch]Repo argument 'PowdrgitExamples' matched multiple repositories. Please confirm any results or actions are as expected.
+
+	RepoName  BranchName IsCheckedOut IsRemote RepoPath
+	--------  ---------- ------------ -------- --------
+	MyToolbox feature1          False    False C:\PowdrgitExamples\MyToolbox
+	MyToolbox feature3          False    False C:\PowdrgitExamples\MyToolbox
+	Project1  newfeature         True    False C:\PowdrgitExamples\Project1
+
 	.INPUTS
 	[System.String]
-	Accepts string objects via the RepoName parameter. The output of Get-GitRepo can be piped into Get-GitBranch.
+	Accepts string objects via the Repo parameter. The output of Get-GitRepo can be piped into Get-GitBranch.
 
 	.OUTPUTS
 	[GitBranch]
@@ -209,37 +229,49 @@ function Get-GitBranch
 	Author : nmbell
 
 	.LINK
-	about_powdrgit
+	Set-GitBranch
 	.LINK
 	Get-GitRepo
 	.LINK
-	Set-GitBranch
+	Get-GitLog
+	.LINK
+	Get-GitTag
+	.LINK
+	about_powdrgit
 	#>
 
-    # Use cmdlet binding
+	# Function alias
+	[Alias('ggb')]
+
+	# Use cmdlet binding
 	[CmdletBinding(
 	  DefaultParameterSetName = 'Remote'
 	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitBranch.md'
 	)]
 
-    # Declare parameters
-    Param(
+	# Declare parameters
+	Param(
 
-    	[Parameter(
-    	  Mandatory                       = $false
-    	, Position                        = 0
-    	, ValueFromPipeline               = $true
-    	, ValueFromPipelineByPropertyName = $true
+		[Parameter(
+		  Mandatory                       = $false
+		, Position                        = 0
+		, ValueFromPipeline               = $false
+		, ValueFromPipelineByPropertyName = $true
 		)]
-		[ArgumentCompleter({
-			Param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
-			Get-GitRepo -Verbose:$false -WarningAction SilentlyContinue `
-				| Select-Object -ExpandProperty RepoName `
-				| Where-Object { $_ -like "$wordToComplete*" } `
-				| Sort-Object
-		})]
-		[String]
-		$RepoName
+	#	[ArgumentCompleter()]
+		[Alias('RepoName','RepoPath')]
+		[String[]]
+		$Repo
+
+	,	[Parameter(
+		  Mandatory                       = $false
+		, Position                        = 1
+		, ValueFromPipeline               = $false
+		, ValueFromPipelineByPropertyName = $true
+		)]
+	#	[ArgumentCompleter()]
+		[String[]]
+		$BranchName = '*'
 
 	,	[Parameter(ParameterSetName = 'Current')]
 		[Switch]
@@ -254,8 +286,8 @@ function Get-GitBranch
 		$CurrentLast
 
 	,	[Parameter(ParameterSetName = 'CurrentFirst')]
-		[Parameter(ParameterSetName = 'CurrentLast')]
-		[Parameter(ParameterSetName = 'Remote')]
+		[Parameter(ParameterSetName = 'CurrentLast' )]
+		[Parameter(ParameterSetName = 'Remote'      )]
 		[Switch]
 		$IncludeRemote
 
@@ -266,109 +298,136 @@ function Get-GitBranch
 	,	[Switch]
 		$SetLocation
 
-    )
+	)
 
 	BEGIN
 	{
-		$wvBlock          = 'B'
+		$bk = 'B'
 
 		# Common BEGIN:
-		Set-StrictMode -Version 2.0
-		$thisFunctionName = $MyInvocation.InvocationName
+		Set-StrictMode -Version 3.0
+		$thisFunctionName = $MyInvocation.MyCommand
 		$start            = Get-Date
-		$wvIndent         = '|  '*($PowdrgitCallDepth++)
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
+		$indent           = ($Powdrgit.DebugIndentChar[0]+'   ')*($PowdrgitCallDepth++)
+		$PSDefaultParameterValues += @{ '*:Verbose' = $(If ($DebugPreference -notin 'Ignore','SilentlyContinue') { $DebugPreference } Else { $VerbosePreference }) } # turn on Verbose with Debug
+		$warn             = $Powdrgit.ShowWarnings -and !($PSBoundParameters.ContainsKey('WarningAction') -and $PSBoundParameters.WarningAction -eq 'Ignore') # because -WarningAction:Ignore is not implemented correctly
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
 
 		# Function BEGIN:
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finding current location"
-		Push-Location -StackName GetGitBranch
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finding current location"
+		$startLocation = $PWD.Path
 
-		# Initialize variable for output
-		$branches = @()
-	}
-
-	PROCESS
-	{
-		$wvBlock = 'P'
-
-		# Find the repository name from current location
-		If (!$RepoName) { $RepoName = Get-GitRepo -Current | Select-Object -ExpandProperty RepoName }
-
-		# Get the repository info
-		$repo = Set-GitRepo -RepoName $RepoName -PassThru -WarningAction SilentlyContinue
-
-		# Get the branches
-		If ($repo)
-		{
-			# Get local branch info
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finding local branch info"
-			$gitCommand = 'git for-each-ref "refs/heads" --format="%(objectname)|%(refname)|%(HEAD)|%(upstream)"'
-			$gitResults = Invoke-GitExpression -Command $gitCommand -SuppressGitErrorStream
-			ForEach ($line in $gitResults | Where-Object { $_.Trim() })
-			{
-				$lineSplit = $line.Split('|')
-
-				$branchFullName =   $lineSplit[1]
-				$isCheckedOut     = $lineSplit[2] -eq '*'
-				$upstreamFullName = $lineSplit[3]
-				$branchName       = Split-Path -Path $branchFullName -Leaf
-				$upstreamName     = $upstreamFullName.Replace('refs/remotes/','')
-
-				$branches += [GitBranch]@{
-					'RepoName'         = $repo.RepoName
-					'SHA1Hash'         = $lineSplit[0]
-					'BranchName'       = $branchName
-					'IsCheckedOut'     = $isCheckedOut
-					'IsRemote'         = $false
-					'Upstream'         = $upstreamName
-					'BranchFullName'   = $branchFullName
-					'UpstreamFullName' = $upstreamFullName
-				}
-			}
-
-			# Get remote branch info
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finding remote branch info"
-			$gitCommand = 'git for-each-ref "refs/remotes" --format="%(objectname)|%(refname)"'
-			$gitResults = Invoke-GitExpression -Command $gitCommand -SuppressGitErrorStream
-			ForEach ($line in $gitResults | Where-Object { $_.Trim() })
-			{
-				$lineSplit = $line.Split('|')
-
-				$branchFullName = $lineSplit[1]
-				$branchName     = Split-Path -Path $branchFullName -Leaf
-
-				If ($branches.Count -gt 0 -and $branchFullName -in $branches.UpstreamFullName) { Continue } # omit remote branches that are the upstream for a local one
-				If ($branchName -eq 'HEAD') { Continue }                                                    # omit HEAD
-
-				$branches += [GitBranch]@{
-					'RepoName'         = $repo.RepoName
-					'SHA1Hash'         = $lineSplit[0]
-					'BranchName'       = $branchName
-					'IsCheckedOut'     = $false
-					'IsRemote'         = $true
-					'Upstream'         = $null
-					'BranchFullName'   = $branchFullName
-					'UpstreamFullName' = $null
-				}
-			}
-		}
-		ElseIf ($RepoName)
-		{
-			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
-		}
-    }
-
-	END
-	{
-		$wvBlock = 'E'
-
-		# Set sort order
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting sort order"
+		# Initialize variables
+		$matchingBranchesTotal = 0
 		$sortRepoName          = @{ Expression = 'RepoName'    ; Ascending  = $true }
 		$sortBranchName        = @{ Expression = 'BranchName'  ; Ascending  = $true }
 		$sortIsCheckedOutFirst = @{ Expression = 'IsCheckedOut'; Descending = $true }
 		$sortIsCheckedOutLast  = @{ Expression = 'IsCheckedOut'; Ascending  = $true }
 		$sortIsRemote          = @{ Expression = 'IsRemote'    ; Ascending  = $true }
+	}
+
+	PROCESS
+	{
+		$bk = 'P'
+
+		# Find the repository path from current location if necessary
+		If (!$PSBoundParameters.ContainsKey('Repo')) { $Repo = Get-GitRepo -Current | Select-Object -ExpandProperty RepoPath }
+
+		# Get the repository info
+		$validRepos = Get-ValidRepo -Repo $Repo
+
+		# Get the branches
+		$matchingBranches = @()
+		ForEach ($validRepo in $validRepos)
+		{
+ 			# Keep track of which BranchName patterns don't match any branches
+			$unmatchedBranchNames = @{}
+			ForEach ($_branchName in $BranchName) { $unmatchedBranchNames.$_branchName = $null }
+
+			# Move to the repository directory
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Moving to the repository directory: $($validRepo.RepoPath)"
+			Set-GitRepo -Repo $validRepo.RepoPath -WarningAction Ignore
+
+			# Get local branch info
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finding local branch info"
+			$gitCommand = 'git for-each-ref "refs/heads" --format="%(objectname)|%(refname)|%(HEAD)|%(upstream)"'
+			$gitResults = Invoke-GitExpression -Command $gitCommand -SuppressGitErrorStream
+			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found local  branches: $('{0,3}' -f ($gitResults | Measure-Object).Count)"
+			ForEach ($line in $gitResults | Where-Object { $_.Trim() })
+			{
+				$lineSplit = $line.Split('|')
+
+				$branchFullName   = $lineSplit[1]
+				$isCheckedOut     = $lineSplit[2] -eq '*'
+				$upstreamFullName = $lineSplit[3]
+				$thisBranchName   = Split-Path -Path $branchFullName -Leaf
+				$upstreamName     = $upstreamFullName.Replace('refs/remotes/','')
+
+				ForEach ($_branchName in $BranchName)
+				{
+					If ($thisBranchName -like $_branchName)
+					{
+						$matchingBranches += [GitBranch]@{
+							'RepoName'         = $validRepo.RepoName
+							'RepoPath'         = $validRepo.RepoPath
+							'SHA1Hash'         = $lineSplit[0]
+							'BranchName'       = $thisBranchName
+							'IsCheckedOut'     = $isCheckedOut
+							'IsRemote'         = $false
+							'Upstream'         = $upstreamName
+							'BranchFullName'   = $branchFullName
+							'UpstreamFullName' = $upstreamFullName
+						}
+						$unmatchedBranchNames.Remove($_branchName)
+					}
+				}
+			}
+
+			# Get remote branch info
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finding remote branch info"
+			$gitCommand = 'git for-each-ref "refs/remotes" --format="%(objectname)|%(refname)"'
+			$gitResults = Invoke-GitExpression -Command $gitCommand -SuppressGitErrorStream
+			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found remote branches: $('{0,3}' -f ($gitResults | Measure-Object).Count)"
+			ForEach ($line in $gitResults | Where-Object { $_.Trim() })
+			{
+				$lineSplit = $line.Split('|')
+
+				$branchFullName = $lineSplit[1]
+				$thisBranchName = Split-Path -Path $branchFullName -Leaf
+
+				If ($matchingBranches.Count -gt 0 -and $branchFullName -in $matchingBranches.UpstreamFullName) { Continue } # omit remote branches that are the upstream for a local one
+				If ($thisBranchName -eq 'HEAD') { Continue }                                                                # omit HEAD
+
+				ForEach ($_branchName in $BranchName)
+				{
+					If ($thisBranchName -like $_branchName)
+					{
+						$matchingBranches += [GitBranch]@{
+							'RepoName'         = $validRepo.RepoName
+							'RepoPath'         = $validRepo.RepoPath
+							'SHA1Hash'         = $lineSplit[0]
+							'BranchName'       = $thisBranchName
+							'IsCheckedOut'     = $false
+							'IsRemote'         = $true
+							'Upstream'         = $null
+							'BranchFullName'   = $branchFullName
+							'UpstreamFullName' = $null
+						}
+						$unmatchedBranchNames.Remove($_branchName)
+					}
+				}
+			}
+
+			# Warn if any BranchName values didn't match a branch
+			If ($unmatchedBranchNames.Count)
+			{
+				If ($warn) { Write-Warning "[$thisFunctionName]The following BranchName patterns did not match any branches in the '$($validRepo.RepoName)' repository: '$($unmatchedBranchNames.Keys -join "','")'" }
+			}
+		}
+		$matchingBranchesTotal += $matchingBranches.Count
+
+		# Set sort order
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Setting sort order"
 		$sortProperty = @()
 		$sortProperty += $sortRepoName
 		If ($CurrentFirst) { $sortProperty += $sortIsCheckedOutFirst }
@@ -377,23 +436,29 @@ function Get-GitBranch
 		$sortProperty += $sortBranchName
 
 		# Output
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Outputting branches: $(($branches | Measure-Object).Count)"
-		Write-Output $branches `
-			| Where-Object { ($Current -and $_.IsCheckedOut) -or !$Current } `
-			| Where-Object { ($IncludeRemote -and $_.IsRemote) -or (!$ExcludeLocal -and !$_.IsRemote) } `
-			| Sort-Object -Property $sortProperty
+		Write-Debug "$(ts)$indent[$thisFunctionName][$bk]Outputting branches  : $('{0,3}' -f $matchingBranches.Count)"
+		Write-Output $matchingBranches `
+		| Where-Object { ($Current -and $_.IsCheckedOut) -or !$Current } `
+		| Where-Object { ($IncludeRemote -and $_.IsRemote) -or (!$ExcludeLocal -and !$_.IsRemote) } `
+		| Sort-Object -Property $sortProperty
+	}
+
+	END
+	{
+		$bk = 'E'
 
 		# Function END:
+		Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Output branches total: $('{0,3}' -f $matchingBranchesTotal)"
 		If (!$SetLocation)
 		{
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting location to original directory"
-			Pop-Location -StackName GetGitBranch
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Setting location to original directory"
+			Set-Location -Path $startLocation
 		}
 
 		# Common END:
 		$end      = Get-Date
 		$duration = New-TimeSpan -Start $start -End $end
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($('{0}d {1:00}:{2:00}:{3:00}.{4:000}' -f $duration.Days,$duration.Hours,$duration.Minutes,$duration.Seconds,$duration.Milliseconds))"
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($($duration.ToString('d\d\ hh\:mm\:ss\.fff')))"
 		$PowdrgitCallDepth--
 	}
 }

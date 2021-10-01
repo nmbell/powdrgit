@@ -21,19 +21,15 @@ function Write-GitBranchOut
 
 	.LINK
 	about_powdrgit
-	.LINK
-	Set-GitBranch
 	#>
 
-    # Use cmdlet binding
-    [CmdletBinding(
-	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Write-GitBranchOut.md'
-	)]
+	# Use cmdlet binding
+	[CmdletBinding()]
 
 	# Suppress warnings from PSScriptAnalyzer
 	[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost","")]
 
-    # Declare parameters
+	# Declare parameters
 	Param(
 
 		[Parameter(Mandatory = $true)]
@@ -46,10 +42,7 @@ function Write-GitBranchOut
 		$OutputValue
 
 	,	[Parameter(Mandatory = $true)]
-		[ArgumentCompleter({
-			Param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
-			@('None','Pipe')+[Enum]::GetValues([System.ConsoleColor]) | Where-Object { $_ -like "$wordToComplete*" }
-		})]
+	#	[ArgumentCompleter()]
 		[String]
 		$OutputStream
 
@@ -57,23 +50,24 @@ function Write-GitBranchOut
 
 	BEGIN
 	{
-		# $wvBlock          = 'B'
+		$bk = 'B'
 
 		# Common BEGIN:
-		Set-StrictMode -Version 2.0
-		# $thisFunctionName = $MyInvocation.InvocationName
-		# $start            = Get-Date
-		# $wvIndent         = '|  '*($PowdrgitCallDepth++)
-		# Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
+		Set-StrictMode -Version 3.0
+		$thisFunctionName = $MyInvocation.MyCommand
+		$start            = Get-Date
+		$indent           = ($Powdrgit.DebugIndentChar[0]+'   ')*($PowdrgitCallDepth++)
+		$PSDefaultParameterValues += @{ '*:Verbose' = $(If ($DebugPreference -notin 'Ignore','SilentlyContinue') { $DebugPreference } Else { $VerbosePreference }) } # turn on Verbose with Debug
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
 
 		# Function BEGIN:
 	}
 
 	PROCESS
 	{
-		# $wvBlock = 'P'
+		$bk = 'P'
 
-		# Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Writing $OutputType"
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Writing $OutputType"
 		If ($OutputStream -ne 'None')
 		{
 			If ($OutputStream -eq 'Pipe')
@@ -94,18 +88,18 @@ function Write-GitBranchOut
 				}
 			}
 		}
-    }
+	}
 
 	END
 	{
-		# $wvBlock = 'E'
+		$bk = 'E'
 
 		# Function END:
 
 		# Common END:
-		# $end      = Get-Date
-		# $duration = New-TimeSpan -Start $start -End $end
-		# Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($('{0}d {1:00}:{2:00}:{3:00}.{4:000}' -f $duration.Days,$duration.Hours,$duration.Minutes,$duration.Seconds,$duration.Milliseconds))"
-		# $PowdrgitCallDepth--
+		$end      = Get-Date
+		$duration = New-TimeSpan -Start $start -End $end
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($($duration.ToString('d\d\ hh\:mm\:ss\.fff')))"
+		$PowdrgitCallDepth--
 	}
 }

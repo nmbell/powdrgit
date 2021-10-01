@@ -2,60 +2,71 @@ function Find-GitRepo
 {
 	<#
 	.SYNOPSIS
-	Finds all git repositories that exist under the specifed root directory.
+	Finds all git repositories that exist under the specifed directory.
 
 	.DESCRIPTION
-	Finds all git repositories that exist under the specifed root directory.
-	Searches the specifed directory and its subdirectories and returns a set of directory objects, each of which is a git repository.
+	Finds all git repositories that exist under the specifed directory.
+	Searches the specifed directory and, optionally, its subdirectories and returns a set of directory objects, each of which is a git repository.
 
-	.PARAMETER RootDirectory
+	.PARAMETER Path
 	An array of directory paths to be searched. Paths that do not exist will be ignored.
 	If the parameter is omitted, or null, or an empty string, all fixed drives will be searched.
 
-	.PARAMETER SetGitRepoPath
-	Populates the $GitRepoPath module variable with a list of the paths for all found repositories.
+	.PARAMETER Recurse
+	Search subdirectories of the specifed directory.
 
-	.PARAMETER AppendGitRepoPath
-	Appends the list of paths for all found repositories to the $GitRepoPath module variable.
-	Paths that are already in the $GitRepoPath module variable will not be duplicated.
+	.PARAMETER SetPowdrgitPath
+	Populates the $Powdrgit.Path module variable with a list of the paths for all found repositories.
+
+	.PARAMETER AppendPowdrgitPath
+	Appends the list of paths for all found repositories to the $Powdrgit.Path module variable.
+	Paths that are already in the $Powdrgit.Path module variable will not be duplicated.
 
 	.EXAMPLE
-	## Find git repositories under a root directory ##
+	## Find git repositories under a specifed directory ##
 
-	PS C:\> Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' | Select-Object -ExpandProperty FullName
+	PS C:\> Find-GitRepo -Path 'C:\PowdrgitExamples' | Select-Object -ExpandProperty FullName
 	C:\PowdrgitExamples\MyToolbox
 	C:\PowdrgitExamples\Project1
 
 	.EXAMPLE
-	## Populate the $GitRepoPath module variable with SetGitRepoPath parameter ##
+	## Find git repositories under the default directory ##
 
-	PS C:\> $GitRepoPath = $null
-	PS C:\> Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' -SetGitRepoPath | Out-Null
-	PS C:\> $GitRepoPath
+	PS C:\> $Powdrgit.DefaultDir = 'C:\PowdrgitExamples'
+	PS C:\> Find-GitRepo -Path $Powdrgit.DefaultDir | Select-Object -ExpandProperty FullName
+	C:\PowdrgitExamples\MyToolbox
+	C:\PowdrgitExamples\Project1
+
+	# PowerShell does not currently support multiple optional mutually exlusive parameter sets, which would allow a DefaultDir parameter.
+	# To work around this, the $Powdrgit.DefaultDir module variable is instead passed to the Path parameter.
+
+	.EXAMPLE
+	## Populate the $Powdrgit.Path module variable with SetPowdrgitPath parameter ##
+
+	PS C:\> $Powdrgit.Path = $null
+	PS C:\> Find-GitRepo -Path 'C:\PowdrgitExamples' -SetPowdrgitPath | Out-Null
+	PS C:\> $Powdrgit.Path
 	C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1
 
 	.EXAMPLE
-	## Populate the $GitRepoPath module variable with function output ##
+	## Populate the $Powdrgit.Path module variable with function output ##
 
-	PS C:\> $GitRepoPath = $null
-	PS C:\> $GitRepoPath = (Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' | Select-Object -ExpandProperty FullName) -join ';'
-	PS C:\> $GitRepoPath
+	PS C:\> $Powdrgit.Path = $null
+	PS C:\> $Powdrgit.Path = (Find-GitRepo -Path 'C:\PowdrgitExamples' | Select-Object -ExpandProperty FullName) -join ';'
+	PS C:\> $Powdrgit.Path
 	C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1
 
-	# This example uses the output of Find-GitRepo to populate the $GitRepoPath module variable.
+	# This example uses the output of Find-GitRepo to populate the $Powdrgit.Path module variable.
 	# It is equivalent to the previous example, however, this method may be preferred when filtering is required e.g.:
-	# $GitRepoPath = (Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' | Where-Object Name -ne 'MyToolbox' | Select-Object -ExpandProperty FullName) -join ';'
+	# $Powdrgit.Path = (Find-GitRepo -Path 'C:\PowdrgitExamples' | Where-Object Name -ne 'MyToolbox' | Select-Object -ExpandProperty FullName) -join ';'
 
 	.EXAMPLE
-	## Use AppendGitRepoPath to add new repositories to the $GitRepoPath module variable ##
+	## Use AppendPowdrgitPath to add new repositories to the $Powdrgit.Path module variable ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the existing repository paths are defined
-	PS C:\> git init "C:\PowdrgitExamples2\Project2" 2>&1 | Out-Null # create a new git repository
-	PS C:\> Find-GitRepo -RootDirectory 'C:\PowdrgitExamples2' -AppendGitRepoPath | Out-Null
-	PS C:\> $GitRepoPath
-	C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1;C:\PowdrgitExamples2\Project2
-
-	# Clean up if required: Remove-Item -Path 'C:\PowdrgitExamples2' -Recurse -Force
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox' # to ensure the existing repository paths are defined
+	PS C:\> Find-GitRepo -Path 'C:\PowdrgitExamples\Project1' -AppendPowdrgitPath | Out-Null
+	PS C:\> $Powdrgit.Path
+	C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1'
 
 	.EXAMPLE
 	## Find git repositories by piping objects ##
@@ -70,7 +81,7 @@ function Find-GitRepo
 	C:\PowdrgitExamples\MyToolbox
 	C:\PowdrgitExamples\Project1
 
-	# Path and FullName are aliases for the RootDirectory parameter, allowing directory objects to be piped to Find-GitRepo.
+	# FullName is an alias for the Path parameter, allowing directory objects to be piped to Find-GitRepo.
 
 	.INPUTS
 	[System.IO.DirectoryInfo]
@@ -84,23 +95,36 @@ function Find-GitRepo
 	Author : nmbell
 
 	.LINK
-	about_powdrgit
-	.LINK
 	Get-GitRepo
 	.LINK
 	Set-GitRepo
 	.LINK
-	Test-GitRepoPath
+	New-GitRepo
+	.LINK
+	Remove-GitRepo
+	.LINK
+	Invoke-GitClone
+	.LINK
+	Add-PowdrgitPath
+	.LINK
+	Remove-PowdrgitPath
+	.LINK
+	Test-PowdrgitPath
+	.LINK
+	about_powdrgit
 	#>
 
-    # Use cmdlet binding
+	# Function alias
+	[Alias('fgr')]
+
+	# Use cmdlet binding
 	[CmdletBinding(
-	  DefaultParameterSetName = 'Set'
+	  DefaultParameterSetName = 'AppendPowdrgitPath'
 	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Find-GitRepo.md'
 	)]
 
-    # Declare parameters
-    Param(
+	# Declare parameters
+	Param(
 
 		[Parameter(
 		  Mandatory                       = $false
@@ -108,106 +132,144 @@ function Find-GitRepo
 		, ValueFromPipeline               = $true
 		, ValueFromPipelineByPropertyName = $true
 		)]
-		[Alias('FullName','Path')]
+		[Alias('FullName')]
 		[String[]]
-		$RootDirectory
+		$Path
+
+	,	[Switch]
+		$Recurse
 
 	,	[Parameter(
-		  ParameterSetName = 'Set'
-		, Mandatory        = $false
+		  Mandatory        = $false
+		, ParameterSetName = 'SetPowdrgitPath'
 		)]
 		[Switch]
-		$SetGitRepoPath
+		$SetPowdrgitPath
 
 	,	[Parameter(
-		  ParameterSetName = 'Append'
-		, Mandatory        = $false
+		  Mandatory        = $false
+		, ParameterSetName = 'AppendPowdrgitPath'
 		)]
 		[Switch]
-		$AppendGitRepoPath
+		$AppendPowdrgitPath
 
 	)
 
 	BEGIN
 	{
-		$wvBlock          = 'B'
+		$bk = 'B'
 
 		# Common BEGIN:
-		Set-StrictMode -Version 2.0
-		$thisFunctionName = $MyInvocation.InvocationName
+		Set-StrictMode -Version 3.0
+		$thisFunctionName = $MyInvocation.MyCommand
 		$start            = Get-Date
-		$wvIndent         = '|  '*($PowdrgitCallDepth++)
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
+		$indent           = ($Powdrgit.DebugIndentChar[0]+'   ')*($PowdrgitCallDepth++)
+		$PSDefaultParameterValues += @{ '*:Verbose' = $(If ($DebugPreference -notin 'Ignore','SilentlyContinue') { $DebugPreference } Else { $VerbosePreference }) } # turn on Verbose with Debug
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
 
 		# Function BEGIN:
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finding current location"
-		Push-Location -StackName FindGitRepo
-
-		If (!$RootDirectory)
-		{
-			$RootDirectory = Get-Volume `
-								| Where-Object { $_.DriveType -eq 'Fixed' -and $_.DriveLetter } `
-								| Select-Object @{ l = 'DrivePath'; e = {$_.DriveLetter+':\'} } `
-								| Sort-Object -Property DrivePath `
-								| Select-Object -ExpandProperty DrivePath
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting root directory list to $RootDirectory"
-		}
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finding current location"
+		$startLocation = $PWD.Path
 	}
 
 	PROCESS
 	{
-		$wvBlock = 'P'
+		$bk = 'P'
 
-		[System.IO.DirectoryInfo[]]$gitReposAll = @()
-		ForEach ($drivePath in $RootDirectory)
+		If (!$Path)
 		{
-			[System.IO.DirectoryInfo[]]$gitRepos = @()
-			If (!(Test-Path -Path $drivePath))
+			$Path = Get-Volume `
+					| Where-Object { $_.DriveType -eq 'Fixed' -and $_.DriveLetter } `
+					| Select-Object @{ l = 'DrivePath'; e = {$_.DriveLetter+':\'} } `
+					| Sort-Object -Property DrivePath `
+					| Select-Object -ExpandProperty DrivePath
+			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Setting root directory list to $Path"
+		}
+
+		$gitReposAll = @()
+
+		ForEach ($_path in $Path)
+		{
+			$gitReposDir = @()
+
+			If (!(Test-Path -Path $_path))
 			{
-				Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Skipping root directory $drivePath (does not exist)"
+				Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Skipping root directory $_path (does not exist)"
 			}
 			Else
 			{
-				Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Looking for git repositories under $drivePath"
-				Set-Location -Path $drivePath
-				Get-ChildItem -Directory -Hidden -Recurse -Filter '.git' -ErrorAction SilentlyContinue `
-					| Where-Object { $_.FullName -notlike '*\$RECYCLE.BIN\*' } `
-					| Select-Object -ExpandProperty Parent `
-					| Tee-Object -Variable gitRepos
-				Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Found $($gitRepos.Count) repositories under $drivePath"
+				Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Looking for git repositories under $_path"
+
+				# .git repositories
+				$gitRepos = @()
+				$gitRepos = Get-ChildItem -Path $_path -Directory -Recurse:$Recurse -ErrorAction Ignore `
+							| Where-Object { $_.FullName -notlike '*\$RECYCLE.BIN\*' } `
+							| Where-Object { Test-Path -Path "$($_.FullName)\.git" } `
+							| Select-Object -ExpandProperty FullName `
+							| Where-Object { $_ -notin $gitReposDir }
+				If ($gitRepos)
+				{
+					$gitReposDir += $gitRepos
+					Get-Item -Path $gitRepos
+				}
+
+				# Bare repositories
+				$gitRepos = @()
+				$gitRepos = Get-ChildItem -Path $_path -Directory -Recurse:$Recurse -Filter '*.git' -ErrorAction Ignore `
+							| Select-Object -ExpandProperty FullName `
+							| Where-Object { $_ -notin $gitReposDir }
+				If ($gitRepos)
+				{
+					$gitReposDir += $gitRepos
+					Get-Item -Path $gitRepos
+				}
+
+				# The root directory itself
+				$gitRepos = @()
+				$gitRepos = Get-Item -Path $_path -ErrorAction Ignore `
+							| Where-Object { (Test-Path -Path "$($_.FullName)\.git") -or ($_.PSIsContainer -eq $true -and $_.Name -like '*.git') } `
+							| Select-Object -ExpandProperty FullName `
+							| Where-Object { $_ -notin $gitReposDir }
+				If ($gitRepos)
+				{
+					$gitReposDir += $gitRepos
+					Get-Item -Path $gitRepos
+				}
+
+				Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found $('{0,3}' -f $gitReposDir.Count) repositories in $_path`:"
+				$gitReposDir | Sort-Object | ForEach-Object { Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]  $_" }
+				If ($gitReposDir) { $gitReposAll += $gitReposDir }
 			}
-			$gitReposAll += $gitRepos
 		}
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Found $($gitReposAll.Count) repositories total"
+		$gitReposAllCount = $gitReposAll | Select-Object -Unique | Measure-Object | Select-Object -ExpandProperty Count
+		Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found $('{0,3}' -f $gitReposAllCount) unique repositories total"
 
-		If ($SetGitRepoPath)
+		If ($SetPowdrgitPath -and $gitReposAll)
 		{
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting `$GitRepoPath module variable"
-			$script:GitRepoPath = ($gitReposAll | Select-Object -ExpandProperty FullName) -join ';'
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Setting `$Powdrgit.Path module variable"
+			$Powdrgit.Path = $null
+			Add-PowdrgitPath -Path $gitReposAll
 		}
 
-		If ($AppendGitRepoPath)
+		If ($AppendPowdrgitPath -and $gitReposAll)
 		{
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Appending to `$GitRepoPath module variable"
-			$script:GitRepoPath += (';'*[Bool]$script:GitRepoPath)+(($gitReposAll | Select-Object -ExpandProperty FullName) -join ';')
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Appending to `$Powdrgit.Path module variable"
+			Add-PowdrgitPath -Path $gitReposAll
 		}
-
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Deduping and ordering items in `$GitRepoPath module variable"
-		$script:GitRepoPath = (($script:GitRepoPath -split ';') | Select-Object -Unique | Sort-Object) -join ';'
-    }
+	}
 
 	END
 	{
-		$wvBlock = 'E'
+		$bk = 'E'
 
 		# Function END:
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting location to original directory"
-		Pop-Location -StackName FindGitRepo
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Setting location to original directory"
+		Set-Location -Path $startLocation
 
 		# Common END:
 		$end      = Get-Date
 		$duration = New-TimeSpan -Start $start -End $end
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($('{0}d {1:00}:{2:00}:{3:00}.{4:000}' -f $duration.Days,$duration.Hours,$duration.Minutes,$duration.Seconds,$duration.Milliseconds))"
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($($duration.ToString('d\d\ hh\:mm\:ss\.fff')))"
 		$PowdrgitCallDepth--
 	}
 }

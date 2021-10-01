@@ -1,4 +1,4 @@
-﻿# Set-GitRepo
+# Set-GitRepo
 
 ## SYNOPSIS
 Sets the working directory to the top level directory of the specified repository.
@@ -6,7 +6,7 @@ Sets the working directory to the top level directory of the specified repositor
 ## SYNTAX
 
 ```
-Set-GitRepo [[-RepoName] <String>] [-PassThru] [<CommonParameters>]
+Set-GitRepo [[-Repo] <String[]>] [-PassThru] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -18,7 +18,7 @@ Sets the working directory to the top level directory of the specified repositor
 ```
 ## Call without specifying a repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 PS C:\> Set-GitRepo
 PS C:\>
 
@@ -29,10 +29,10 @@ PS C:\>
 ```
 ## Move to a non-existent repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitRepo -RepoName NonExistentRepo
-WARNING: [Set-GitRepo]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
-PS C:\>
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+PS C:\> Set-GitRepo -Repo NonExistentRepo
+WARNING: [Set-GitRepo]Repository 'NonExistentRepo' not found. Check the repository directory exists and has been added to the $Powdrgit.Path module variable.
 
 # The current location (reflected in the prompt) did not change.
 ```
@@ -41,9 +41,9 @@ PS C:\>
 ```
 ## Move to an existing repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitRepo -RepoName MyToolbox
-PS C:\PowdrgitExamples\MyToolbox\>
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitRepo -Repo MyToolbox
+PS C:\PowdrgitExamples\MyToolbox>
 
 # The current location (reflected in the prompt) changed to the repository's top-level directory.
 ```
@@ -52,12 +52,28 @@ PS C:\PowdrgitExamples\MyToolbox\>
 ```
 ## Call with PassThru switch ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitRepo -RepoName MyToolbox -PassThru | Select-Object -ExpandProperty FullName
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitRepo -Repo MyToolbox -PassThru | Select-Object -ExpandProperty RepoPath
 C:\PowdrgitExamples\MyToolbox
-PS C:\PowdrgitExamples\MyToolbox\>
+PS C:\PowdrgitExamples\MyToolbox>
 
 # Because the object returned is an extension of a file system object, any of its usual properties are available in the output.
+```
+
+### EXAMPLE 5
+```
+## Call with Repo value matching multiple repositories ##
+
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+PS C:\> Set-GitRepo -Repo PowdrgitExamples -PassThru | Select-Object -ExpandProperty RepoPath
+C:\PowdrgitExamples\MyToolbox
+WARNING: [Set-GitRepo]'PowdrgitExamples' matched multiple repositories. Please confirm any results or actions are as expected.
+C:\PowdrgitExamples\MyToolbox
+C:\PowdrgitExamples\Project1
+PS C:\PowdrgitExamples\Project1>
+
+# Note: in this case, the final location that is set will be the matching repository path that is last alphabetically.
 ```
 
 ## PARAMETERS
@@ -77,22 +93,20 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RepoName
-The name of the git repository to return.
-The powdrgit module always takes the name of the top-level repository directory as the repository name.
-It does not use values from a repository's config or origin URL as the name.
-This should match the directory name of one of the repositories defined in the $GitRepoPath module variable.
-If there is no match, a warning is generated.
+### -Repo
+The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+If the Repo parameter is omitted, nothing will happen.
+For examples of using the Repo parameter, refer to the help text for Get-GitRepo.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: RepoName, RepoPath
 
 Required: False
 Position: 1
 Default value: None
-Accept pipeline input: True (ByPropertyName, ByValue)
+Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
@@ -103,7 +117,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 [System.String]
 
-Accepts string objects via the RepoName parameter.
+Accepts string objects via the Repo parameter.
 
 ## OUTPUTS
 
@@ -111,19 +125,28 @@ Accepts string objects via the RepoName parameter.
 
 When the PassThru switch is used, returns directory objects.
 
-
 ## NOTES
 Author : nmbell
 
 ## RELATED LINKS
 
-[about_powdrgit](about_powdrgit.md)
-
 [Find-GitRepo](Find-GitRepo.md)
 
 [Get-GitRepo](Get-GitRepo.md)
 
-[Test-GitRepoPath](Test-GitRepoPath.md)
+[New-GitRepo](New-GitRepo.md)
+
+[Remove-GitRepo](Remove-GitRepo.md)
+
+[Invoke-GitClone](Invoke-GitClone.md)
+
+[Add-PowdrgitPath](Add-PowdrgitPath.md)
+
+[Remove-PowdrgitPath](Remove-PowdrgitPath.md)
+
+[Test-PowdrgitPath](Test-PowdrgitPath.md)
+
+[about_powdrgit](about_powdrgit.md)
 
 
 

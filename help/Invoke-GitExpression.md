@@ -1,4 +1,4 @@
-﻿# Invoke-GitExpression
+# Invoke-GitExpression
 
 ## SYNOPSIS
 Runs the provided git command on the local computer.
@@ -22,37 +22,35 @@ The function will also accept non-git commands, but the output from non-git comm
 ```
 ## Native git command vs Invoke-GitExpression - output to console ##
 
-# This example assumes commands are run against the main branch of an existing git repository, which is tracking a remote repository branch and is up to date.
-
-C:\MyRepo\> git checkout main
+C:\PowdrgitExamples\MyToolbox\> git checkout main
 Already on 'main'
-Your branch is up to date with 'origin/main'.
-C:\MyRepo\>
+Your branch is ahead of 'origin/main' by 3 commits.
+  (use "git push" to publish your local commits)
+C:\PowdrgitExamples\MyToolbox\>
 
-# Although not obvious, the first line of the above output from the native git command is from the error stream, and the second is from the success stream.
+# Although not obvious, the first line of the above output from the native git command is from the error stream, and the second and third are from the success stream.
 
-C:\MyRepo\> Invoke-GitExpression -Command 'git checkout main'
+C:\PowdrgitExamples\MyToolbox\> Invoke-GitExpression -Command 'git checkout main'
 Already on 'main'
-Your branch is up to date with 'origin/main'.
-C:\MyRepo\>
+Your branch is ahead of 'origin/main' by 3 commits.
+  (use "git push" to publish your local commits)
+C:\PowdrgitExamples\MyToolbox\>
 
-# The same results appear in the console. Also not obvious, but this time both lines of output are coming from Powershell's success stream.
+# The same results appear in the console. Also not obvious, but this time all lines of output are coming from Powershell's success stream.
 ```
 
 ### EXAMPLE 2
 ```
 ## Native git command vs Invoke-GitExpression - output to Out-Null ##
 
-# This example assumes commands are run against the main branch of an existing git repository, which is tracking a remote repository branch and is up to date.
-
-C:\MyRepo\> git checkout main | Out-Null
+C:\PowdrgitExamples\MyToolbox\> git checkout main | Out-Null
 Already on 'main'
-C:\MyRepo\>
+C:\PowdrgitExamples\MyToolbox\>
 
 # Piping to Out-Null usually results in nothing returned to the console. However, here we see a message returned, coming from git's error stream.
 
-C:\MyRepo\> Invoke-GitExpression -Command 'git checkout main' | Out-Null
-C:\MyRepo\>
+C:\PowdrgitExamples\MyToolbox\> Invoke-GitExpression -Command 'git checkout main' | Out-Null
+C:\PowdrgitExamples\MyToolbox\>
 
 # This time, all output is suppressed, as expected.
 ```
@@ -61,22 +59,21 @@ C:\MyRepo\>
 ```
 ## Invoke-GitExpression - suppressing output ##
 
-# This example assumes commands are run against the main branch of an existing git repository, which is tracking a remote repository branch and is up to date.
-
-C:\MyRepo\> Invoke-GitExpression -Command 'git checkout main' -SuppressGitErrorStream
-Your branch is up to date with 'origin/main'.
-C:\MyRepo\>
+C:\PowdrgitExamples\MyToolbox\> Invoke-GitExpression -Command 'git checkout main' -SuppressGitErrorStream
+Your branch is ahead of 'origin/main' by 3 commits.
+  (use "git push" to publish your local commits)
+C:\PowdrgitExamples\MyToolbox\>
 
 # The message coming from git's error stream has been omitted.
 
-C:\MyRepo\> Invoke-GitExpression -Command 'git checkout main' -SuppressGitSuccessStream
+C:\PowdrgitExamples\MyToolbox\> Invoke-GitExpression -Command 'git checkout main' -SuppressGitSuccessStream
 Already on 'main'
-C:\MyRepo\>
+C:\PowdrgitExamples\MyToolbox\>
 
 # The message coming from git's success stream has been omitted.
 
-C:\MyRepo\> Invoke-GitExpression -Command 'git checkout main' -SuppressGitSuccessStream -SuppressGitErrorStream
-C:\MyRepo\>
+C:\PowdrgitExamples\MyToolbox\> Invoke-GitExpression -Command 'git checkout main' -SuppressGitSuccessStream -SuppressGitErrorStream
+C:\PowdrgitExamples\MyToolbox\>
 
 # Using both switches suppresses all output, equivalent to piping to Out-Null.
 ```
@@ -143,15 +140,16 @@ Accepts string objects via the Command parameter.
 
 Returns String objects.
 
-
 ## NOTES
 Author : nmbell
 
 ## RELATED LINKS
 
-[about_powdrgit](about_powdrgit.md)
-
 [Set-GitBranch](Set-GitBranch.md)
+
+[Invoke-GitClone](Invoke-GitClone.md)
+
+[about_powdrgit](about_powdrgit.md)
 
 
 

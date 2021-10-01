@@ -7,24 +7,24 @@ function Get-GitLog
 	.DESCRIPTION
 	Gets a list of commits from the git log.
 
-	.PARAMETER RepoName
-	The name of the git repository to return.
-	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
-	When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+	.PARAMETER Repo
+	The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+	If the Repo parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+	For examples of using the Repo parameter, refer to the help text for Get-GitRepo.
 
 	.PARAMETER InRef
 	A list of repository references (i.e. branch names, tag names, or commit SHA1 hashes).
 	Commits reachable from any of these references are included in the results. If ommitted, defaults to HEAD.
-	See https://git-scm.com/docs/git-log#_description.
+	For further details on how to specify a reference, see https://git-scm.com/docs/gitrevisions#_specifying_revisions.
 
 	.PARAMETER NotInRef
 	A list of repository references (i.e. branch names, tag names, or commit SHA1 hashes).
 	Commits reachable from any of these references are excluded from the results. If ommitted, defaults to HEAD.
-	See https://git-scm.com/docs/git-log#_description.
+	For further details on how to specify a reference, see https://git-scm.com/docs/gitrevisions#_specifying_revisions.
 
 	.PARAMETER RefRange
 	A revision range used to limit the commits returned, given in native git format e.g. "branch1...branch2".
-	See https://git-scm.com/docs/gitrevisions.
+	For further details on how to specify a range, see https://git-scm.com/docs/gitrevisions#_specifying_ranges.
 
 	.PARAMETER Count
 	Specifies the number of commits to retrieve. Commits are retrieved in reverse order, so specifying a Count of 5 will return the last 5 commits.
@@ -35,17 +35,17 @@ function Get-GitLog
 	.EXAMPLE
 	## Call from outside a repository without parameters ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitLog
 
-	# Nothing was returned because a RepoName was not provided.
+	# Nothing was returned because a Repo was not provided.
 
 	.EXAMPLE
-	## Call from outside a repository with RepoName parameter ##
+	## Call from outside a repository with Repo parameter ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main # checkout the main branch from the current location
-	PS C:\> Get-GitLog -RepoName MyToolbox | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main # checkout the main branch from the current location
+	PS C:\> Get-GitLog -Repo MyToolbox | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 	RepoName  SHA1Hash                                 AuthorName Subject
 	--------  --------                                 ---------- -------
@@ -59,8 +59,8 @@ function Get-GitLog
 	.EXAMPLE
 	## Get commits from the current repository ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitLog | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 	RepoName  SHA1Hash                                 AuthorName Subject
@@ -73,8 +73,8 @@ function Get-GitLog
 	.EXAMPLE
 	## Call with Count parameter ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitLog -Count 3 | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 	RepoName  SHA1Hash                                 AuthorName Subject
@@ -88,8 +88,8 @@ function Get-GitLog
 	.EXAMPLE
 	## Call with NoMerges switch ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitLog -NoMerges | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 	RepoName  SHA1Hash                                 AuthorName Subject
@@ -103,8 +103,8 @@ function Get-GitLog
 	.EXAMPLE
 	## Call with InRef and NotInRef ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitLog -InRef feature3 -NotInRef main | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 	RepoName  SHA1Hash                                 AuthorName Subject
@@ -116,8 +116,8 @@ function Get-GitLog
 	.EXAMPLE
 	## Call with RefRange ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitLog -RefRange 'main..feature3' | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 	RepoName  SHA1Hash                                 AuthorName Subject
@@ -128,7 +128,7 @@ function Get-GitLog
 
 	.INPUTS
 	[System.String]
-	Accepts string objects via the RepoName parameter. The output of Get-GitRepo can be piped into Get-GitLog.
+	Accepts string objects via the Repo parameter. The output of Get-GitRepo can be piped into Get-GitLog.
 
 	.OUTPUTS
 	[GitCommit]
@@ -139,133 +139,98 @@ function Get-GitLog
 	Author : nmbell
 
 	.LINK
-	about_powdrgit
-	.LINK
 	Get-GitCommit
 	.LINK
 	Get-GitCommitFile
 	.LINK
 	Get-GitFileHistory
+	.LINK
+	Get-GitRepo
+	.LINK
+	about_powdrgit
 	#>
 
-    # Use cmdlet binding
+	# Function alias
+	[Alias('ggl')]
+
+	# Use cmdlet binding
 	[CmdletBinding(
 	  DefaultParameterSetName = 'InRef'
 	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitLog.md'
 	)]
 
-    # Declare parameters
-    Param(
+	# Declare parameters
+	Param(
 
-    	[Parameter(
-    	  Mandatory                       = $false
+		[Parameter(
+		  Mandatory                       = $false
 		, Position                        = 0
-    	, ValueFromPipeline               = $true
-    	, ValueFromPipelineByPropertyName = $true
+		, ValueFromPipeline               = $false
+		, ValueFromPipelineByPropertyName = $true
 		)]
-		[ArgumentCompleter({
-			Param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
-			Get-GitRepo -Verbose:$false `
-				| Select-Object -ExpandProperty RepoName `
-				| Where-Object { $_ -like "$wordToComplete*" } `
-				| Sort-Object
-		})]
-		[String]
-		$RepoName
+	#	[ArgumentCompleter()]
+		[Alias('RepoName','RepoPath')]
+		[String[]]
+		$Repo
 
-    ,	[Parameter(
-    	  ParameterSetName                = 'InRef'
-    	, Mandatory                       = $false
-    	, ValueFromPipeline               = $false
-    	, ValueFromPipelineByPropertyName = $true
+	,	[Parameter(
+		  Mandatory                       = $false
+		, ValueFromPipeline               = $false
+		, ValueFromPipelineByPropertyName = $true
+		, ParameterSetName                = 'InRef'
 		)]
-		[ArgumentCompleter({
-			Param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
-			$argRepoName = $fakeBoundParameters.RepoName
-			If (!($fakeBoundParameters.ContainsKey('RepoName')))
-			{
-				$argRepoName = Get-GitRepo -Verbose:$false -Current | Select-Object -ExpandProperty RepoName
-			}
-			@(
-				Get-GitBranch -Verbose:$false -RepoName $argRepoName `
-					| Sort-Object -Property @{ Expression = 'IsCheckedOut'; Descending = $true },@{ Expression = 'BranchName'; Ascending = $true } `
-					| Select-Object -ExpandProperty BranchName `
-			)+@(
-				Get-GitTag -Verbose:$false -RepoName $argRepoName `
-					| Select-Object -ExpandProperty TagName `
-					| Sort-Object TagName
-			) `
-				| Where-Object { $_ -like "$wordToComplete*" }
-
-		})]
+	#	[ArgumentCompleter()]
 		[Alias('SHA1Hash')]
 		[String[]]
 		$InRef
 
-    ,	[Parameter(
-    	  ParameterSetName                = 'InRef'
-    	, Mandatory                       = $false
-    	, ValueFromPipeline               = $false
-    	, ValueFromPipelineByPropertyName = $false
+	,	[Parameter(
+		  Mandatory                       = $false
+		, ValueFromPipeline               = $false
+		, ValueFromPipelineByPropertyName = $false
+		, ParameterSetName                = 'InRef'
 		)]
-		[ArgumentCompleter({
-			Param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
-			$argRepoName = $fakeBoundParameters.RepoName
-			If (!($fakeBoundParameters.ContainsKey('RepoName')))
-			{
-				$argRepoName = Get-GitRepo -Verbose:$false -Current | Select-Object -ExpandProperty RepoName
-			}
-			@(
-				Get-GitBranch -Verbose:$false -RepoName $argRepoName `
-					| Sort-Object -Property @{ Expression = 'IsCheckedOut'; Descending = $true },@{ Expression = 'BranchName'; Ascending = $true } `
-					| Select-Object -ExpandProperty BranchName `
-			)+@(
-				Get-GitTag -Verbose:$false -RepoName $argRepoName `
-					| Select-Object -ExpandProperty TagName `
-					| Sort-Object TagName
-			) `
-				| Where-Object { $_ -like "$wordToComplete*" }
-
-		})]
+	#	[ArgumentCompleter()]
 		[String[]]
 		$NotInRef
 
 	,	[Parameter(
-    	  ParameterSetName                = 'RefRange'
-    	, Mandatory                       = $false
-    	, ValueFromPipeline               = $false
-    	, ValueFromPipelineByPropertyName = $false
+		  Mandatory                       = $false
+		, ValueFromPipeline               = $false
+		, ValueFromPipelineByPropertyName = $false
+		, ParameterSetName                = 'RefRange'
 		)]
 		[String[]]
 		$RefRange
 
-    ,	[Parameter(
-    	  Mandatory                       = $false
-    	, ValueFromPipeline               = $false
-    	, ValueFromPipelineByPropertyName = $true
+	,	[Parameter(
+		  Mandatory                       = $false
+		, ValueFromPipeline               = $false
+		, ValueFromPipelineByPropertyName = $true
 		)]
 		[Int32]
 		$Count
 
-    ,	[Switch]
+	,	[Switch]
 		$NoMerges
 
-    )
+	)
 
 	BEGIN
 	{
-		$wvBlock          = 'B'
+		$bk = 'B'
 
 		# Common BEGIN:
-		Set-StrictMode -Version 2.0
-		$thisFunctionName = $MyInvocation.InvocationName
+		Set-StrictMode -Version 3.0
+		$thisFunctionName = $MyInvocation.MyCommand
 		$start            = Get-Date
-		$wvIndent         = '|  '*($PowdrgitCallDepth++)
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
+		$indent           = ($Powdrgit.DebugIndentChar[0]+'   ')*($PowdrgitCallDepth++)
+		$PSDefaultParameterValues += @{ '*:Verbose' = $(If ($DebugPreference -notin 'Ignore','SilentlyContinue') { $DebugPreference } Else { $VerbosePreference }) } # turn on Verbose with Debug
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
 
 		# Function BEGIN:
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finding current location"
-		Push-Location -StackName GetGitLog
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finding current location"
+		$startLocation = $PWD.Path
 
 		$startOfText = '!!>>' # commit info delimiter
 		$endOfText   = '<<!!' # commit info delimiter
@@ -274,16 +239,22 @@ function Get-GitLog
 
 	PROCESS
 	{
-		$wvBlock = 'P'
+		$bk = 'P'
 
 		# Find the repository name from current location
-		If (!$RepoName) { $RepoName = Get-GitRepo -Current | Select-Object -ExpandProperty RepoName }
+		If (!$PSBoundParameters.ContainsKey('Repo')) { $Repo = Get-GitRepo -Current | Select-Object -ExpandProperty RepoPath }
 
-		# Go to the repository and get the repository info
-		$repo = Set-GitRepo -RepoName $RepoName -PassThru -WarningAction SilentlyContinue
+		# Get the repository info
+		$validRepos = Get-ValidRepo -Repo $Repo
 
-		If ($repo)
+		# Get the log entries
+		ForEach ($validRepo in $validRepos)
 		{
+			# Go to the repository and get the repository info
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Moving to the repository directory: $($validRepo.RepoPath)"
+			Set-GitRepo -Repo $validRepo.RepoPath -WarningAction Ignore
+
+			# Get log entries
 			$gitCommand = $gitCommandTemplate
 
 			$refRangeReplacement = '<InRef><NotInRef>'
@@ -304,9 +275,10 @@ function Get-GitLog
 			$gitCommand = $gitCommand.Replace('<Count>'          ,$countReplacement   )
 			$gitCommand = $gitCommand.Replace('<NoMerges>'       ,$noMergesReplacement)
 
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Getting git log for $RepoName"
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Getting git log for $($validRepo.RepoName)"
 			$gitResults = Invoke-GitExpression -Command $gitCommand -SuppressGitErrorStream `
-							| ConvertTo-GitParsableResults -StartOfText $startOfText -EndOfText $endOfText
+						  | ConvertTo-GitParsableResults -StartOfText $startOfText -EndOfText $endOfText
+			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found log entries: $('{0,3}' -f ($gitResults | Measure-Object).Count)"
 
 			# Parse the results
 			If ($gitResults)
@@ -317,7 +289,8 @@ function Get-GitLog
 
 					# Output
 					[GitCommit]@{
-						'RepoName'       = $repo.Name
+						'RepoName'       = $validRepo.RepoName
+						'RepoPath'       = $validRepo.RepoPath
 						'SHA1Hash'       = $lineSplit[0]
 						'TreeHash'       = $lineSplit[1]
 						'ParentHashes'   = $lineSplit[2].Split(' ').Trim()
@@ -335,24 +308,20 @@ function Get-GitLog
 				}
 			}
 		}
-		ElseIf ($RepoName)
-		{
-			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
-		}
-    }
+	}
 
 	END
 	{
-		$wvBlock = 'E'
+		$bk = 'E'
 
 		# Function END:
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting location to original directory"
-		Pop-Location -StackName GetGitLog
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Setting location to original directory"
+		Set-Location -Path $startLocation
 
 		# Common END:
 		$end      = Get-Date
 		$duration = New-TimeSpan -Start $start -End $end
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($('{0}d {1:00}:{2:00}:{3:00}.{4:000}' -f $duration.Days,$duration.Hours,$duration.Minutes,$duration.Seconds,$duration.Milliseconds))"
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($($duration.ToString('d\d\ hh\:mm\:ss\.fff')))"
 		$PowdrgitCallDepth--
 	}
 }

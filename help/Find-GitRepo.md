@@ -1,73 +1,83 @@
-﻿# Find-GitRepo
+# Find-GitRepo
 
 ## SYNOPSIS
-Finds all git repositories that exist under the specifed root directory.
+Finds all git repositories that exist under the specifed directory.
 
 ## SYNTAX
 
-### Set (Default)
+### AppendPowdrgitPath (Default)
 ```
-Find-GitRepo [[-RootDirectory] <String[]>] [-SetGitRepoPath] [<CommonParameters>]
+Find-GitRepo [[-Path] <String[]>] [-Recurse] [-AppendPowdrgitPath] [<CommonParameters>]
 ```
 
-### Append
+### SetPowdrgitPath
 ```
-Find-GitRepo [[-RootDirectory] <String[]>] [-AppendGitRepoPath] [<CommonParameters>]
+Find-GitRepo [[-Path] <String[]>] [-Recurse] [-SetPowdrgitPath] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Finds all git repositories that exist under the specifed root directory.
-Searches the specifed directory and its subdirectories and returns a set of directory objects, each of which is a git repository.
+Finds all git repositories that exist under the specifed directory.
+Searches the specifed directory and, optionally, its subdirectories and returns a set of directory objects, each of which is a git repository.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-## Find git repositories under a root directory ##
+## Find git repositories under a specifed directory ##
 
-PS C:\> Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' | Select-Object -ExpandProperty FullName
+PS C:\> Find-GitRepo -Path 'C:\PowdrgitExamples' | Select-Object -ExpandProperty FullName
 C:\PowdrgitExamples\MyToolbox
 C:\PowdrgitExamples\Project1
 ```
 
 ### EXAMPLE 2
 ```
-## Populate the $GitRepoPath module variable with SetGitRepoPath parameter ##
+## Find git repositories under the default directory ##
 
-PS C:\> $GitRepoPath = $null
-PS C:\> Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' -SetGitRepoPath | Out-Null
-PS C:\> $GitRepoPath
-C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1
+PS C:\> $Powdrgit.DefaultDir = 'C:\PowdrgitExamples'
+PS C:\> Find-GitRepo -Path $Powdrgit.DefaultDir | Select-Object -ExpandProperty FullName
+C:\PowdrgitExamples\MyToolbox
+C:\PowdrgitExamples\Project1
+
+# PowerShell does not currently support multiple optional mutually exlusive parameter sets, which would allow a DefaultDir parameter.
+# To work around this, the $Powdrgit.DefaultDir module variable is instead passed to the Path parameter.
 ```
 
 ### EXAMPLE 3
 ```
-## Populate the $GitRepoPath module variable with function output ##
+## Populate the $Powdrgit.Path module variable with SetPowdrgitPath parameter ##
 
-PS C:\> $GitRepoPath = $null
-PS C:\> $GitRepoPath = (Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' | Select-Object -ExpandProperty FullName) -join ';'
-PS C:\> $GitRepoPath
+PS C:\> $Powdrgit.Path = $null
+PS C:\> Find-GitRepo -Path 'C:\PowdrgitExamples' -SetPowdrgitPath | Out-Null
+PS C:\> $Powdrgit.Path
 C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1
-
-# This example uses the output of Find-GitRepo to populate the $GitRepoPath module variable.
-# It is equivalent to the previous example, however, this method may be preferred when filtering is required e.g.:
-# $GitRepoPath = (Find-GitRepo -RootDirectory 'C:\PowdrgitExamples' | Where-Object Name -ne 'MyToolbox' | Select-Object -ExpandProperty FullName) -join ';'
 ```
 
 ### EXAMPLE 4
 ```
-## Use AppendGitRepoPath to add new repositories to the $GitRepoPath module variable ##
+## Populate the $Powdrgit.Path module variable with function output ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the existing repository paths are defined
-PS C:\> git init "C:\PowdrgitExamples2\Project2" 2\>&1 | Out-Null # create a new git repository
-PS C:\> Find-GitRepo -RootDirectory 'C:\PowdrgitExamples2' -AppendGitRepoPath | Out-Null
-PS C:\> $GitRepoPath
-C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1;C:\PowdrgitExamples2\Project2
+PS C:\> $Powdrgit.Path = $null
+PS C:\> $Powdrgit.Path = (Find-GitRepo -Path 'C:\PowdrgitExamples' | Select-Object -ExpandProperty FullName) -join ';'
+PS C:\> $Powdrgit.Path
+C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1
 
-# Clean up if required: Remove-Item -Path 'C:\PowdrgitExamples2' -Recurse -Force
+# This example uses the output of Find-GitRepo to populate the $Powdrgit.Path module variable.
+# It is equivalent to the previous example, however, this method may be preferred when filtering is required e.g.:
+# $Powdrgit.Path = (Find-GitRepo -Path 'C:\PowdrgitExamples' | Where-Object Name -ne 'MyToolbox' | Select-Object -ExpandProperty FullName) -join ';'
 ```
 
 ### EXAMPLE 5
+```
+## Use AppendPowdrgitPath to add new repositories to the $Powdrgit.Path module variable ##
+
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox' # to ensure the existing repository paths are defined
+PS C:\> Find-GitRepo -Path 'C:\PowdrgitExamples\Project1' -AppendPowdrgitPath | Out-Null
+PS C:\> $Powdrgit.Path
+C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1'
+```
+
+### EXAMPLE 6
 ```
 ## Find git repositories by piping objects ##
 
@@ -81,18 +91,18 @@ PS C:\> Get-Item -Path 'C:\PowdrgitExamples' | Find-GitRepo | Select-Object -Exp
 C:\PowdrgitExamples\MyToolbox
 C:\PowdrgitExamples\Project1
 
-# Path and FullName are aliases for the RootDirectory parameter, allowing directory objects to be piped to Find-GitRepo.
+# FullName is an alias for the Path parameter, allowing directory objects to be piped to Find-GitRepo.
 ```
 
 ## PARAMETERS
 
-### -AppendGitRepoPath
-Appends the list of paths for all found repositories to the $GitRepoPath module variable.
-Paths that are already in the $GitRepoPath module variable will not be duplicated.
+### -AppendPowdrgitPath
+Appends the list of paths for all found repositories to the $Powdrgit.Path module variable.
+Paths that are already in the $Powdrgit.Path module variable will not be duplicated.
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: Append
+Parameter Sets: AppendPowdrgitPath
 Aliases:
 
 Required: False
@@ -102,7 +112,7 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RootDirectory
+### -Path
 An array of directory paths to be searched.
 Paths that do not exist will be ignored.
 If the parameter is omitted, or null, or an empty string, all fixed drives will be searched.
@@ -110,7 +120,7 @@ If the parameter is omitted, or null, or an empty string, all fixed drives will 
 ```yaml
 Type: String[]
 Parameter Sets: (All)
-Aliases: FullName, Path
+Aliases: FullName
 
 Required: False
 Position: 1
@@ -119,12 +129,27 @@ Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 
-### -SetGitRepoPath
-Populates the $GitRepoPath module variable with a list of the paths for all found repositories.
+### -Recurse
+Search subdirectories of the specifed directory.
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: Set
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SetPowdrgitPath
+Populates the $Powdrgit.Path module variable with a list of the paths for all found repositories.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: SetPowdrgitPath
 Aliases:
 
 Required: False
@@ -149,19 +174,28 @@ Accepts directory objects.
 
 Returns directory objects.
 
-
 ## NOTES
 Author : nmbell
 
 ## RELATED LINKS
 
-[about_powdrgit](about_powdrgit.md)
-
 [Get-GitRepo](Get-GitRepo.md)
 
 [Set-GitRepo](Set-GitRepo.md)
 
-[Test-GitRepoPath](Test-GitRepoPath.md)
+[New-GitRepo](New-GitRepo.md)
+
+[Remove-GitRepo](Remove-GitRepo.md)
+
+[Invoke-GitClone](Invoke-GitClone.md)
+
+[Add-PowdrgitPath](Add-PowdrgitPath.md)
+
+[Remove-PowdrgitPath](Remove-PowdrgitPath.md)
+
+[Test-PowdrgitPath](Test-PowdrgitPath.md)
+
+[about_powdrgit](about_powdrgit.md)
 
 
 

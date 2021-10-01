@@ -7,10 +7,10 @@ function Set-GitRepo
 	.DESCRIPTION
 	Sets the working directory to the top level directory of the specified repository.
 
-	.PARAMETER RepoName
-	The name of the git repository to return.
-	The powdrgit module always takes the name of the top-level repository directory as the repository name. It does not use values from a repository's config or origin URL as the name.
-	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
+	.PARAMETER Repo
+	The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+	If the Repo parameter is omitted, nothing will happen.
+	For examples of using the Repo parameter, refer to the help text for Get-GitRepo.
 
 	.PARAMETER PassThru
 	Returns the directory object for the repository top-level directory.
@@ -18,7 +18,7 @@ function Set-GitRepo
 	.EXAMPLE
 	## Call without specifying a repository ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Set-GitRepo
 	PS C:\>
 
@@ -27,18 +27,18 @@ function Set-GitRepo
 	.EXAMPLE
 	## Move to a non-existent repository ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitRepo -RepoName NonExistentRepo
-	WARNING: [Set-GitRepo]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
-	PS C:\>
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+	PS C:\> Set-GitRepo -Repo NonExistentRepo
+	WARNING: [Set-GitRepo]Repository 'NonExistentRepo' not found. Check the repository directory exists and has been added to the $Powdrgit.Path module variable.
 
 	# The current location (reflected in the prompt) did not change.
 
 	.EXAMPLE
 	## Move to an existing repository ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitRepo -RepoName MyToolbox
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitRepo -Repo MyToolbox
 	PS C:\PowdrgitExamples\MyToolbox>
 
 	# The current location (reflected in the prompt) changed to the repository's top-level directory.
@@ -46,16 +46,30 @@ function Set-GitRepo
 	.EXAMPLE
 	## Call with PassThru switch ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitRepo -RepoName MyToolbox -PassThru | Select-Object -ExpandProperty FullName
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitRepo -Repo MyToolbox -PassThru | Select-Object -ExpandProperty RepoPath
 	C:\PowdrgitExamples\MyToolbox
 	PS C:\PowdrgitExamples\MyToolbox>
 
 	# Because the object returned is an extension of a file system object, any of its usual properties are available in the output.
 
+	.EXAMPLE
+	## Call with Repo value matching multiple repositories ##
+
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+	PS C:\> Set-GitRepo -Repo PowdrgitExamples -PassThru | Select-Object -ExpandProperty RepoPath
+	C:\PowdrgitExamples\MyToolbox
+	WARNING: [Set-GitRepo]'PowdrgitExamples' matched multiple repositories. Please confirm any results or actions are as expected.
+	C:\PowdrgitExamples\MyToolbox
+	C:\PowdrgitExamples\Project1
+	PS C:\PowdrgitExamples\Project1>
+
+	# Note: in this case, the final location that is set will be the matching repository path that is last alphabetically.
+
 	.INPUTS
 	[System.String]
-	Accepts string objects via the RepoName parameter.
+	Accepts string objects via the Repo parameter.
 
 	.OUTPUTS
 	[System.IO.DirectoryInfo]
@@ -65,90 +79,96 @@ function Set-GitRepo
 	Author : nmbell
 
 	.LINK
-	about_powdrgit
-	.LINK
 	Find-GitRepo
 	.LINK
 	Get-GitRepo
 	.LINK
-	Test-GitRepoPath
+	New-GitRepo
+	.LINK
+	Remove-GitRepo
+	.LINK
+	Invoke-GitClone
+	.LINK
+	Add-PowdrgitPath
+	.LINK
+	Remove-PowdrgitPath
+	.LINK
+	Test-PowdrgitPath
+	.LINK
+	about_powdrgit
 	#>
 
-    # Use cmdlet binding
-    [CmdletBinding(
+	# Function alias
+	[Alias('sgr')]
+
+	# Use cmdlet binding
+	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Set-GitRepo.md'
 	)]
 
-    # Declare parameters
-    Param(
+	# Declare parameters
+	Param(
 
-    	[Parameter(
-    	  Mandatory                       = $false
-    	, Position                        = 0
-    	, ValueFromPipeline               = $true
-    	, ValueFromPipelineByPropertyName = $true
+		[Parameter(
+		  Mandatory                       = $false
+		, Position                        = 0
+		, ValueFromPipeline               = $false
+		, ValueFromPipelineByPropertyName = $true
 		)]
-		[ArgumentCompleter({
-			Param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
-			Get-GitRepo -Verbose:$false `
-				| Select-Object -ExpandProperty RepoName `
-				| Where-Object { $_ -like "$wordToComplete*" } `
-				| Sort-Object
-		})]
-		[String]
-		$RepoName
+	#	[ArgumentCompleter()]
+		[Alias('RepoName','RepoPath')]
+		[String[]]
+		$Repo
 
 	,	[Switch]
 		$PassThru
 
-    )
+	)
 
 	BEGIN
 	{
-		$wvBlock          = 'B'
+		$bk = 'B'
 
 		# Common BEGIN:
-		Set-StrictMode -Version 2.0
-		$thisFunctionName = $MyInvocation.InvocationName
+		Set-StrictMode -Version 3.0
+		$thisFunctionName = $MyInvocation.MyCommand
 		$start            = Get-Date
-		$wvIndent         = '|  '*($PowdrgitCallDepth++)
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
+		$indent           = ($Powdrgit.DebugIndentChar[0]+'   ')*($PowdrgitCallDepth++)
+		$PSDefaultParameterValues += @{ '*:Verbose' = $(If ($DebugPreference -notin 'Ignore','SilentlyContinue') { $DebugPreference } Else { $VerbosePreference }) } # turn on Verbose with Debug
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
 
 		# Function BEGIN:
 	}
 
 	PROCESS
 	{
-		$wvBlock = 'P'
+		$bk = 'P'
 
 		# Get the repository info
-		$repo = Get-GitRepo -RepoName $RepoName
+		$validRepos = Get-ValidRepo -Repo $Repo
 
-		If ($repo)
+		# Set the location
+		ForEach ($validRepo in $validRepos)
 		{
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting location to repository directory: $($repo.FullName)"
-			Set-Location -Path $repo.FullName
+			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Setting location to repository directory: $($validRepo.RepoPath)"
+			Set-Location -Path $validRepo.RepoPath
 			If ($PassThru)
 			{
-				Write-Output $repo
+				Write-Output $validRepo
 			}
 		}
-		ElseIf ($RepoName)
-		{
-			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
-		}
-    }
+	}
 
 	END
 	{
-		$wvBlock = 'E'
+		$bk = 'E'
 
 		# Function END:
 
 		# Common END:
 		$end      = Get-Date
 		$duration = New-TimeSpan -Start $start -End $end
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($('{0}d {1:00}:{2:00}:{3:00}.{4:000}' -f $duration.Days,$duration.Hours,$duration.Minutes,$duration.Seconds,$duration.Milliseconds))"
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($($duration.ToString('d\d\ hh\:mm\:ss\.fff')))"
 		$PowdrgitCallDepth--
 	}
 }

@@ -23,57 +23,54 @@ function Invoke-GitExpression
 	.EXAMPLE
 	## Native git command vs Invoke-GitExpression - output to console ##
 
-	# This example assumes commands are run against the main branch of an existing git repository, which is tracking a remote repository branch and is up to date.
-
-	C:\MyRepo> git checkout main
+	C:\PowdrgitExamples\MyToolbox> git checkout main
 	Already on 'main'
-	Your branch is up to date with 'origin/main'.
-	C:\MyRepo>
+	Your branch is ahead of 'origin/main' by 3 commits.
+	  (use "git push" to publish your local commits)
+	C:\PowdrgitExamples\MyToolbox>
 
-	# Although not obvious, the first line of the above output from the native git command is from the error stream, and the second is from the success stream.
+	# Although not obvious, the first line of the above output from the native git command is from the error stream, and the second and third are from the success stream.
 
-	C:\MyRepo> Invoke-GitExpression -Command 'git checkout main'
+	C:\PowdrgitExamples\MyToolbox> Invoke-GitExpression -Command 'git checkout main'
 	Already on 'main'
-	Your branch is up to date with 'origin/main'.
-	C:\MyRepo>
+	Your branch is ahead of 'origin/main' by 3 commits.
+	  (use "git push" to publish your local commits)
+	C:\PowdrgitExamples\MyToolbox>
 
-	# The same results appear in the console. Also not obvious, but this time both lines of output are coming from Powershell's success stream.
+	# The same results appear in the console. Also not obvious, but this time all lines of output are coming from Powershell's success stream.
 
 	.EXAMPLE
 	## Native git command vs Invoke-GitExpression - output to Out-Null ##
 
-	# This example assumes commands are run against the main branch of an existing git repository, which is tracking a remote repository branch and is up to date.
-
-	C:\MyRepo> git checkout main | Out-Null
+	C:\PowdrgitExamples\MyToolbox> git checkout main | Out-Null
 	Already on 'main'
-	C:\MyRepo>
+	C:\PowdrgitExamples\MyToolbox>
 
 	# Piping to Out-Null usually results in nothing returned to the console. However, here we see a message returned, coming from git's error stream.
 
-	C:\MyRepo> Invoke-GitExpression -Command 'git checkout main' | Out-Null
-	C:\MyRepo>
+	C:\PowdrgitExamples\MyToolbox> Invoke-GitExpression -Command 'git checkout main' | Out-Null
+	C:\PowdrgitExamples\MyToolbox>
 
 	# This time, all output is suppressed, as expected.
 
 	.EXAMPLE
 	## Invoke-GitExpression - suppressing output ##
 
-	# This example assumes commands are run against the main branch of an existing git repository, which is tracking a remote repository branch and is up to date.
-
-	C:\MyRepo> Invoke-GitExpression -Command 'git checkout main' -SuppressGitErrorStream
-	Your branch is up to date with 'origin/main'.
-	C:\MyRepo>
+	C:\PowdrgitExamples\MyToolbox> Invoke-GitExpression -Command 'git checkout main' -SuppressGitErrorStream
+	Your branch is ahead of 'origin/main' by 3 commits.
+	  (use "git push" to publish your local commits)
+	C:\PowdrgitExamples\MyToolbox>
 
 	# The message coming from git's error stream has been omitted.
 
-	C:\MyRepo> Invoke-GitExpression -Command 'git checkout main' -SuppressGitSuccessStream
+	C:\PowdrgitExamples\MyToolbox> Invoke-GitExpression -Command 'git checkout main' -SuppressGitSuccessStream
 	Already on 'main'
-	C:\MyRepo>
+	C:\PowdrgitExamples\MyToolbox>
 
 	# The message coming from git's success stream has been omitted.
 
-	C:\MyRepo> Invoke-GitExpression -Command 'git checkout main' -SuppressGitSuccessStream -SuppressGitErrorStream
-	C:\MyRepo>
+	C:\PowdrgitExamples\MyToolbox> Invoke-GitExpression -Command 'git checkout main' -SuppressGitSuccessStream -SuppressGitErrorStream
+	C:\PowdrgitExamples\MyToolbox>
 
 	# Using both switches suppresses all output, equivalent to piping to Out-Null.
 
@@ -89,26 +86,31 @@ function Invoke-GitExpression
 	Author : nmbell
 
 	.LINK
-	about_powdrgit
-	.LINK
 	Set-GitBranch
+	.LINK
+	Invoke-GitClone
+	.LINK
+	about_powdrgit
 	#>
 
-    # Use cmdlet binding
-    [CmdletBinding(
+	# Function alias
+	[Alias('ige')]
+
+	# Use cmdlet binding
+	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Invoke-GitExpression.md'
 	)]
 
-    # Declare parameters
+	# Declare parameters
 	Param
 	(
 
 		[Parameter(
 		  Mandatory                       = $true
+		, HelpMessage                     = 'Enter the git command to be run. Multiple commands can be separated with a semicolon ";".'
 		, Position                        = 0
 		, ValueFromPipeline               = $true
 		, ValueFromPipelineByPropertyName = $true
-		, HelpMessage                     = 'Enter a command to be run. Multiple commands can be separated with a semi-colon ";".'
 		)]
 		[ValidateNotNullOrEmpty()]
 		[String]
@@ -120,55 +122,50 @@ function Invoke-GitExpression
 	,	[Switch]
 		$SuppressGitErrorStream
 
-    )
+	)
 
 	BEGIN
 	{
-		$wvBlock          = 'B'
+		$bk = 'B'
 
 		# Common BEGIN:
-		Set-StrictMode -Version 2.0
-		$thisFunctionName = $MyInvocation.InvocationName
+		Set-StrictMode -Version 3.0
+		$thisFunctionName = $MyInvocation.MyCommand
 		$start            = Get-Date
-		$wvIndent         = '|  '*($PowdrgitCallDepth++)
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
+		$indent           = ($Powdrgit.DebugIndentChar[0]+'   ')*($PowdrgitCallDepth++)
+		$PSDefaultParameterValues += @{ '*:Verbose' = $(If ($DebugPreference -notin 'Ignore','SilentlyContinue') { $DebugPreference } Else { $VerbosePreference }) } # turn on Verbose with Debug
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
 
 		# Function BEGIN:
 	}
 
 	PROCESS
 	{
-		$wvBlock = 'P'
+		$bk = 'P'
 
 		# Force the command to capture both streams
 		$gitCommand = $Command+' 2>&1'
 
-
 		# Run the command
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Running command: $gitCommand"
-		$gitOutput = $null
-		$gitOutput = Invoke-Expression -Command $gitCommand -ErrorAction SilentlyContinue
-
-		# Prepare the output
-		$fnOutput = @()
-		$gitOutput | Where-Object { $_.GetType().Name -eq    'ErrorRecord'          -and !$SuppressGitErrorStream   }                      | ForEach-Object { $fnOutput += $_.Exception.Message.ToString() }
-		$gitOutput | Where-Object { $_.GetType().Name -eq    'String'               -and !$SuppressGitSuccessStream }                      | ForEach-Object { $fnOutput += $_                              }
-		$gitOutput | Where-Object { $_.GetType().Name -notin 'ErrorRecord','String' -and !$SuppressGitSuccessStream } | Out-String -Stream | ForEach-Object { $fnOutput += $_                              }
-
-		# Output
-		Write-Output $fnOutput
-    }
+		Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]$gitCommand"
+		Invoke-Expression -Command $gitCommand -ErrorAction Ignore `
+		| ForEach-Object {
+			If ($_.GetType().Name -eq    'ErrorRecord'         ) { If (!$SuppressGitErrorStream  ) { $_.Exception.Message.ToString()}; Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]$($_.Exception.Message.ToString())" }
+			If ($_.GetType().Name -eq    'String'              ) { If (!$SuppressGitSuccessStream) { $_                             }; Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]$_"                                 }
+			If ($_.GetType().Name -notin 'ErrorRecord','String') { If (!$SuppressGitSuccessStream) { $_.ToString()                  }; Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]$($_.ToString())"                   }
+		}
+	}
 
 	END
 	{
-		$wvBlock = 'E'
+		$bk = 'E'
 
 		# Function END:
 
 		# Common END:
 		$end      = Get-Date
 		$duration = New-TimeSpan -Start $start -End $end
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($('{0}d {1:00}:{2:00}:{3:00}.{4:000}' -f $duration.Days,$duration.Hours,$duration.Minutes,$duration.Seconds,$duration.Milliseconds))"
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($($duration.ToString('d\d\ hh\:mm\:ss\.fff')))"
 		$PowdrgitCallDepth--
 	}
 }

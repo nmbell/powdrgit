@@ -7,10 +7,10 @@ function Get-GitCommitFile
 	.DESCRIPTION
 	Gets the files associated with a commit.
 
-	.PARAMETER RepoName
-	The name of the git repository to return.
-	This should match the directory name of one of the repositories defined in the $GitRepoPath module variable. If there is no match, a warning is generated.
-	When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+	.PARAMETER Repo
+	The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+	If the Repo parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+	For examples of using the Repo parameter, refer to the help text for Get-GitRepo.
 
 	.PARAMETER SHA1Hash
 	The SHA1 hash of (or a reference to) a commit in the current repository. If omitted, the HEAD commit is used.
@@ -18,24 +18,25 @@ function Get-GitCommitFile
 	.EXAMPLE
 	## Call from outside a repository without parameters ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> Get-GitCommitFile
 
-	# Nothing was returned because a RepoName was not provided.
+	# Nothing was returned because a Repo was not provided.
 
 	.EXAMPLE
 	## Call from outside a repository for non-existent repository ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Get-GitCommitFile -RepoName NonExistentRepo
-	WARNING: [Get-GitCommitFile]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+	PS C:\> Get-GitCommitFile -Repo NonExistentRepo
+	WARNING: [Get-GitCommitFile]Repository 'NonExistentRepo' not found. Check the repository directory exists and has been added to the $Powdrgit.Path module variable.
 
 	.EXAMPLE
-	## Call from outside a repository with RepoName parameter ##
+	## Call from outside a repository with Repo parameter ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main # checkout the main branch from the current location
-	PS C:\> Get-GitCommitFile -RepoName MyToolbox | Format-Table -Property RepoName,SHA1Hash,Exists,FullName
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main # checkout the main branch from the current location
+	PS C:\> Get-GitCommitFile -Repo MyToolbox | Format-Table -Property RepoName,SHA1Hash,Exists,FullName
 
 	RepoName  SHA1Hash                                 Exists FullName
 	--------  --------                                 ------ --------
@@ -46,8 +47,8 @@ function Get-GitCommitFile
 	.EXAMPLE
 	## Call from inside a repository with SHA1Hash parameter ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
 	PS C:\PowdrgitExamples\MyToolbox> $commitHash = Get-GitLog -NoMerges | Where-Object Subject -eq 'Add feature1_File1.txt' | Select-Object -ExpandProperty SHA1Hash # pick a commit from the log
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitCommitFile -SHA1Hash $commitHash | Format-Table -Property RepoName,SHA1Hash,Exists,FullName
 
@@ -58,8 +59,8 @@ function Get-GitCommitFile
 	.EXAMPLE
 	## Pipe results from Get-GitLog ##
 
-	PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-	PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
 	PS C:\PowdrgitExamples\MyToolbox> Get-GitLog -NoMerges | Get-GitCommitFile | Format-Table -Property RepoName,SHA1Hash,Exists,FullName
 
 	RepoName  SHA1Hash                                 Exists FullName
@@ -83,64 +84,66 @@ function Get-GitCommitFile
 	Author : nmbell
 
 	.LINK
-	about_powdrgit
-	.LINK
 	Get-GitCommit
 	.LINK
 	Get-GitFileHistory
 	.LINK
 	Get-GitLog
+	.LINK
+	Get-GitRepo
+	.LINK
+	about_powdrgit
 	#>
 
-    # Use cmdlet binding
-    [CmdletBinding(
+	# Function alias
+	[Alias('ggcf')]
+
+	# Use cmdlet binding
+	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitCommitFile.md'
 	)]
 
-    # Declare parameters
-    Param(
+	# Declare parameters
+	Param(
 
-    	[Parameter(
-    	  Mandatory                       = $false
-    	, Position                        = 0
-    	, ValueFromPipeline               = $false
-    	, ValueFromPipelineByPropertyName = $true
+		[Parameter(
+		  Mandatory                       = $false
+		, Position                        = 0
+		, ValueFromPipeline               = $false
+		, ValueFromPipelineByPropertyName = $true
 		)]
-		[ArgumentCompleter({
-			Param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
-			Get-GitRepo -Verbose:$false `
-				| Select-Object -ExpandProperty RepoName `
-				| Where-Object { $_ -like "$wordToComplete*" } `
-				| Sort-Object
-		})]
-		[String]
-		$RepoName
+	#	[ArgumentCompleter()]
+		[Alias('RepoName','RepoPath')]
+		[String[]]
+		$Repo
 
 	,	[Parameter(
-      	  Mandatory                       = $false
+	  	  Mandatory                       = $false
 		, Position                        = 1
-      	, ValueFromPipeline               = $true
-      	, ValueFromPipelineByPropertyName = $true
-      	)]
+	  	, ValueFromPipeline               = $true
+	  	, ValueFromPipelineByPropertyName = $true
+	  	)]
 		[String]
 		$SHA1Hash = 'HEAD'
 
-    )
+	)
 
 	BEGIN
 	{
-		$wvBlock          = 'B'
+		$bk = 'B'
 
 		# Common BEGIN:
-		Set-StrictMode -Version 2.0
-		$thisFunctionName = $MyInvocation.InvocationName
+		Set-StrictMode -Version 3.0
+		$thisFunctionName = $MyInvocation.MyCommand
 		$start            = Get-Date
-		$wvIndent         = '|  '*($PowdrgitCallDepth++)
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
+		$indent           = ($Powdrgit.DebugIndentChar[0]+'   ')*($PowdrgitCallDepth++)
+		$PSDefaultParameterValues += @{ '*:Verbose' = $(If ($DebugPreference -notin 'Ignore','SilentlyContinue') { $DebugPreference } Else { $VerbosePreference }) } # turn on Verbose with Debug
+		$warn             = $Powdrgit.ShowWarnings -and !($PSBoundParameters.ContainsKey('WarningAction') -and $PSBoundParameters.WarningAction -eq 'Ignore') # because -WarningAction:Ignore is not implemented correctly
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
 
 		# Function BEGIN:
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Storing current location"
-		Push-Location -StackName GetGitCommitInfo
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Storing current location"
+		$startLocation = $PWD.Path
 
 		$gitCommandTemplate = "git diff-tree --root --no-commit-id --name-status -r <SHA1Hash>"
 
@@ -160,32 +163,38 @@ function Get-GitCommitFile
 
 	PROCESS
 	{
-		$wvBlock = 'P'
+		$bk = 'P'
 
 		# Find the repository name from current location
-		If (!$RepoName) { $RepoName = Get-GitRepo -Current | Select-Object -ExpandProperty RepoName }
+		If (!$PSBoundParameters.ContainsKey('Repo')) { $Repo = Get-GitRepo -Current | Select-Object -ExpandProperty RepoPath }
 
-		# move to the repository directory and get the repository info
-		$repo = Set-GitRepo -RepoName $RepoName -PassThru -WarningAction SilentlyContinue
+		# Get the repository info
+		$validRepos = Get-ValidRepo -Repo $Repo
 
-		If ($repo)
+		# Get the commit files
+		ForEach ($validRepo in $validRepos)
 		{
+			# Go to the repository and get the repository info
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Moving to the repository directory: $($validRepo.RepoPath)"
+			Set-GitRepo -Repo $validRepo.RepoPath -WarningAction Ignore
+
 			# Validate parameters
 			$gitCommandRefType = "git cat-file -t $SHA1Hash"
 			$refType = Invoke-GitExpression -Command $gitCommandRefType -SuppressGitErrorStream
 			If ($refType -notin 'commit')
 			{
-				Write-Warning "`"$SHA1Hash`" is not a valid commit in repository '$($repo.Name)'."
+				If ($warn) { Write-Warning "[$thisFunctionName]`"$SHA1Hash`" is not a valid commit in repository '$($validRepo.RepoName)'." }
 			}
 			If ($SHA1Hash -eq 'HEAD')
 			{
-				$SHA1Hash = Get-GitCommit -RepoName $RepoName -SHA1Hash HEAD | Select-Object -ExpandProperty SHA1Hash
+				$SHA1Hash = Get-GitCommit -Repo $Repo -SHA1Hash HEAD | Select-Object -ExpandProperty SHA1Hash
 			}
 
 			# Gather commit files list
-			Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Gathering commit files list"
+			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Gathering commit files list"
 			$gitCommand = $gitCommandTemplate.Replace('<SHA1Hash>',$SHA1Hash)
 			$gitResults = Invoke-GitExpression -Command $gitCommand -SuppressGitErrorStream
+			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found commit files: $('{0,3}' -f ($gitResults | Measure-Object).Count)"
 
 			# Parse the list
 			If ($gitResults)
@@ -196,24 +205,25 @@ function Get-GitCommitFile
 					$linesplit = $line -split "`t"
 
 					$statusScore = $linesplit[0]
-					$filePath1   = $linesplit[1]
-					$filePath2   = $linesplit[2]
+					$filePath1   = If ($linesplit.Count -gt 1) { $linesplit[1] } Else { $null }
+					$filePath2   = If ($linesplit.Count -gt 2) { $linesplit[2] } Else { $null }
 
 					$statusScore -match '(\w)(\d*)' | Out-Null
 					$status = $statusKey[$Matches[1]]
 					$score  = $Matches[2]
 					$thisGitPath = $filePath1*(![Bool]$filePath2)+$filePath2*([Bool]$filePath2)
 					$prevGitPath = $filePath2*(![Bool]$filePath2)+$filePath1*([Bool]$filePath2)
-					$prevFilePath = ($repo.FullName+'\')*([Bool]$prevGitPath)+$prevGitPath
+					$prevFilePath = ($validRepo.RepoPath+'\')*([Bool]$prevGitPath)+$prevGitPath
 
 					# Output
 					[GitCommitFile]@{
-						'RepoName'         = $repo.Name
+						'RepoName'         = $validRepo.RepoName
+						'RepoPath'         = $validRepo.RepoPath
 						'SHA1Hash'         = $SHA1Hash
 						'Action'           = $status
-						'Exists'           = Test-Path -Path ($repo.FullName+'\'+$thisGitPath)
-						'FullName'         = $repo.FullName+'\'+$thisGitPath
-						'Directory'        = $repo.FullName+'\'+[System.IO.Path]::GetDirectoryName($thisGitPath)
+						'Exists'           = Test-Path -Path ($validRepo.RepoPath+'\'+$thisGitPath)
+						'FullName'         = $validRepo.RepoPath+'\'+$thisGitPath
+						'Directory'        = $validRepo.RepoPath+'\'+[System.IO.Path]::GetDirectoryName($thisGitPath)
 						'Name'             = [System.IO.Path]::GetFileName($thisGitPath)
 						'BaseName'         = [System.IO.Path]::GetFileNameWithoutExtension($thisGitPath)
 						'Extension'        = [System.IO.Path]::GetExtension($thisGitPath)
@@ -229,7 +239,8 @@ function Get-GitCommitFile
 			{
 				# Output an 'empty' object
 				[GitCommitFile]@{
-					'RepoName'         = $repo.Name
+					'RepoName'         = $validRepo.RepoName
+					'RepoPath'         = $validRepo.RepoPath
 					'SHA1Hash'         = $SHA1Hash
 					'Action'           = $null
 					'Exists'           = $null
@@ -246,24 +257,20 @@ function Get-GitCommitFile
 				}
 			}
 		}
-		ElseIf ($RepoName)
-		{
-			Write-Warning "[$thisFunctionName]Repository '$RepoName' not found. Check the repository directory has been added to the `$GitRepoPath module variable."
-		}
-    }
+	}
 
 	END
 	{
-		$wvBlock = 'E'
+		$bk = 'E'
 
 		# Function END:
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Setting location to original directory"
-		Pop-Location -StackName GetGitCommitInfo
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Setting location to original directory"
+		Set-Location -Path $startLocation
 
 		# Common END:
 		$end      = Get-Date
 		$duration = New-TimeSpan -Start $start -End $end
-		Write-Verbose "$(wvTimestamp)$wvIndent[$thisFunctionName][$wvBlock]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($('{0}d {1:00}:{2:00}:{3:00}.{4:000}' -f $duration.Days,$duration.Hours,$duration.Minutes,$duration.Seconds,$duration.Milliseconds))"
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finish: $($end.ToString('yyyy-MM-dd HH:mm:ss.fff')) ($($duration.ToString('d\d\ hh\:mm\:ss\.fff')))"
 		$PowdrgitCallDepth--
 	}
 }

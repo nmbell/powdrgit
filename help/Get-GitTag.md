@@ -1,4 +1,4 @@
-﻿# Get-GitTag
+# Get-GitTag
 
 ## SYNOPSIS
 Gets a list of tags for the specified repository.
@@ -6,7 +6,7 @@ Gets a list of tags for the specified repository.
 ## SYNTAX
 
 ```
-Get-GitTag [[-RepoName] <String>] [<CommonParameters>]
+Get-GitTag [[-Repo] <String[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -18,29 +18,29 @@ By default, tags are returned in tag name (alphabetical) order.
 ### EXAMPLE 1
 ```
 ## Call from outside a repository without parameters ##
-
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 PS C:\> Get-GitTag
 PS C:\>
 
-# Nothing was returned because a RepoName was not provided.
+# Nothing was returned because a Repo was not provided.
 ```
 
 ### EXAMPLE 2
 ```
 ## Call from outside a repository for non-existent repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Get-GitTag -RepoName NonExistentRepo
-WARNING: [Get-GitTag]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+PS C:\> Get-GitTag -Repo NonExistentRepo
+WARNING: [Get-GitTag]Repository 'NonExistentRepo' not found. Check the repository directory exists and has been added to the $Powdrgit.Path module variable.
 ```
 
 ### EXAMPLE 3
 ```
-## Call from outside a repository with RepoName parameter ##
+## Call from outside a repository with Repo parameter ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Get-GitTag -RepoName MyToolbox | Format-Table -Property RepoName,TagName,TagType,TagSubject
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Get-GitTag -Repo MyToolbox | Format-Table -Property RepoName,TagName,TagType,TagSubject
 
 RepoName  TagName        TagType TagSubject
 --------  -------        ------- ----------
@@ -54,9 +54,9 @@ MyToolbox lightweightTag commit  feature1 commit
 ```
 ## Get all tags of the current repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitRepo -RepoName MyToolbox
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitTag | Format-Table -Property RepoName,TagName,TagType,TagSubject
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitRepo -Repo MyToolbox
+PS C:\PowdrgitExamples\MyToolbox> Get-GitTag | Format-Table -Property RepoName,TagName,TagType,TagSubject
 
 RepoName  TagName        TagType TagSubject
 --------  -------        ------- ----------
@@ -64,18 +64,31 @@ MyToolbox annotatedTag   tag     This is an annotated tag
 MyToolbox lightweightTag commit  feature1 commit
 ```
 
+### EXAMPLE 5
+```
+## Pipe results from Get-GitRepo ##
+
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Get-GitRepo | Get-GitTag | Format-Table -Property RepoName,TagName,TagType,TagSubject
+
+RepoName  TagName        TagType TagSubject
+--------  -------        ------- ----------
+MyToolbox annotatedTag   tag     This is an annotated tag
+MyToolbox lightweightTag commit  feature1 commit
+Project1  lightweightTag commit  Initial commit
+```
+
 ## PARAMETERS
 
-### -RepoName
-The name of the git repository to return.
-This should match the directory name of one of the repositories defined in the $GitRepoPath module variable.
-If there is no match, a warning is generated.
-When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+### -Repo
+The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+If the Repo parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+For examples of using the Repo parameter, refer to the help text for Get-GitRepo.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: RepoName, RepoPath
 
 Required: False
 Position: 1
@@ -91,7 +104,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 [System.String]
 
-Accepts string objects via the RepoName parameter. The output of Get-GitRepo can be piped into Get-GitTag.
+Accepts string objects via the Repo parameter. The output of Get-GitRepo can be piped into Get-GitTag.
 
 ## OUTPUTS
 
@@ -99,19 +112,22 @@ Accepts string objects via the RepoName parameter. The output of Get-GitRepo can
 
 Returns a custom GitTag object. For details use Get-Member at a command prompt e.g.:
 
-`PS C:\PowdrgitExamples\MyToolbox> Get-GitTag | Get-Member -MemberType Properties`
-
+PS C:\PowdrgitExamples\MyToolbox> Get-GitTag | Get-Member -MemberType Properties
 
 ## NOTES
 Author : nmbell
 
 ## RELATED LINKS
 
-[about_powdrgit](about_powdrgit.md)
+[Get-GitCommit](Get-GitCommit.md)
+
+[Get-GitLog](Get-GitLog.md)
 
 [Get-GitBranch](Get-GitBranch.md)
 
 [Get-GitRepo](Get-GitRepo.md)
+
+[about_powdrgit](about_powdrgit.md)
 
 
 

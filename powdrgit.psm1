@@ -1,15 +1,16 @@
-# powdrgit 1.0.2
+# powdrgit 1.1.0
 [CmdletBinding()]
 Param()
 
-
-# Files to include
+# Include files
 . "$PSScriptRoot\classes\GitBranch.ps1"
 . "$PSScriptRoot\classes\GitCommit.ps1"
 . "$PSScriptRoot\classes\GitCommitFile.ps1"
 . "$PSScriptRoot\classes\GitConfigFile.ps1"
+. "$PSScriptRoot\classes\GitRepo.ps1"
 . "$PSScriptRoot\classes\GitTag.ps1"
 
+. "$PSScriptRoot\functions\Add-PowdrgitPath.ps1"
 . "$PSScriptRoot\functions\ConvertTo-GitParsableResults.ps1"
 . "$PSScriptRoot\functions\Find-GitRepo.ps1"
 . "$PSScriptRoot\functions\Get-GitBranch.ps1"
@@ -20,23 +21,61 @@ Param()
 . "$PSScriptRoot\functions\Get-GitLog.ps1"
 . "$PSScriptRoot\functions\Get-GitRepo.ps1"
 . "$PSScriptRoot\functions\Get-GitTag.ps1"
+. "$PSScriptRoot\functions\Get-ValidRepo.ps1"
+. "$PSScriptRoot\functions\Get-WriteVerboseTimestamp.ps1"
+. "$PSScriptRoot\functions\Invoke-GitClone.ps1"
 . "$PSScriptRoot\functions\Invoke-GitExpression.ps1"
+. "$PSScriptRoot\functions\New-GitRepo.ps1"
+. "$PSScriptRoot\functions\Remove-GitRepo.ps1"
+. "$PSScriptRoot\functions\Remove-PowdrgitPath.ps1"
 . "$PSScriptRoot\functions\Set-GitBranch.ps1"
 . "$PSScriptRoot\functions\Set-GitRepo.ps1"
-. "$PSScriptRoot\functions\Test-GitRepoPath.ps1"
+. "$PSScriptRoot\functions\Test-PowdrgitDefaultDir.ps1"
+. "$PSScriptRoot\functions\Test-PowdrgitPath.ps1"
 . "$PSScriptRoot\functions\Test-SubPath.ps1"
 . "$PSScriptRoot\functions\Write-GitBranchOut.ps1"
-. "$PSScriptRoot\functions\wvTimestamp.ps1"
 
 
-# Variables to initialize
-New-Variable -Name GitRepoPath       -Value $null -Scope Script -Force
-New-Variable -Name PowdrgitCallDepth -Value 0     -Scope Script -Force
+# Initialize variables
+$moduleVars = Get-Content -Path "$PSScriptRoot\config\powdrgit.json" | ConvertFrom-Json
+New-Variable -Name Powdrgit -Value $moduleVars -Scope Script -Force
+New-Variable -Name PowdrgitCallDepth -Value 0 -Scope Script -Force
+
+
+
+# Aliases to export
+$AliasesToExport =
+@(
+	'app'
+	'fgr'
+	'gfh'
+	'ggb'
+	'ggc'
+	'ggcf'
+	'ggcfg'
+	'ggl'
+	'ggr'
+	'ggt'
+	'igc'
+	'ige'
+	'ngr'
+	'rgr'
+	'rpp'
+	'sgb'
+	'sgr'
+	'tpp'
+)
+
+
+# Cmdlets to export
+$CmdletsToExport = @()
 
 
 # Functions to export
-$FunctionsToExport = @(
+$FunctionsToExport =
+@(
 	# 'ConvertTo-GitParsableResults'
+	'Add-PowdrgitPath'
 	'Find-GitRepo'
 	'Get-GitBranch'
 	'Get-GitCommit'
@@ -46,36 +85,35 @@ $FunctionsToExport = @(
 	'Get-GitLog'
 	'Get-GitRepo'
 	'Get-GitTag'
+	# 'Get-ValidRepo'
+	# 'Get-WriteVerboseTimestamp'
+	'Invoke-GitClone'
 	'Invoke-GitExpression'
+	'New-GitRepo'
+	'Remove-GitRepo'
+	'Remove-PowdrgitPath'
 	'Set-GitBranch'
 	'Set-GitRepo'
-	'Test-GitRepoPath'
+	# 'Test-PowdrgitDefaultDir'
+	'Test-PowdrgitPath'
 	# 'Test-SubPath'
 	# 'Write-GitBranchOut'
-	# 'wvTimestamp'
 )
-
-
-# Cmdlets to export
-$CmdletsToExport = @()
 
 
 # Variables to export
-$VariablesToExport = @(
-	'GitRepoPath'
-	'PowdrgitCallDepth'
+$VariablesToExport =
+@(
+	'Powdrgit'
 )
 
 
-# Aliases to export
-$AliasesToExport = @()
-
-
 # Export the members
-$moduleMembers = @{
-	'Function' = $FunctionsToExport
-	'Cmdlet'   = $CmdletsToExport
-	'Variable' = $VariablesToExport
+$moduleMembers =
+@{
 	'Alias'    = $AliasesToExport
+	'Cmdlet'   = $CmdletsToExport
+	'Function' = $FunctionsToExport
+	'Variable' = $VariablesToExport
 }
 Export-ModuleMember @moduleMembers

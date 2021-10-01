@@ -2,8 +2,10 @@ class GitConfigFile
 {
 
 	[String]            $Scope
-	[System.IO.FileInfo]$ConfigFile
+	[String]            $Path
+	[Boolean]           $Exists
+	[System.IO.FileInfo]$FileInfo
 
-	[String]ToString(){ Return $this.ConfigFile.FullName }
+	[String]ToString(){ return $this.FileInfo.FullName }
 
 }

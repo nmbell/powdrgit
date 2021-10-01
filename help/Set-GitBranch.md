@@ -1,4 +1,4 @@
-﻿# Set-GitBranch
+# Set-GitBranch
 
 ## SYNOPSIS
 Checks out the specified branches for the specified repository.
@@ -6,13 +6,14 @@ Checks out the specified branches for the specified repository.
 ## SYNTAX
 
 ```
-Set-GitBranch [[-RepoName] <String>] [-BranchName] <String[]> [-SetLocation] [-GitScript <String>] [-HeaderOut <String>] [-CommandOut <String>] [-ResultsOut <String>] [-GitScriptSeparator <String>] [<CommonParameters>]
+Set-GitBranch [[-Repo] <String[]>] [-BranchName] <String[]> [-SetLocation] [-GitScript <String>] [-HeaderOut <String>] [-CommandOut <String>] [-ResultsOut <String>] [-GitScriptSeparator <String>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 Checks out the specified branches for the specified repository.
 An optional script block may be passed in containing git commands to be executed against each specified branch after it has been checked out.
-The command in the script block will be split by semi-colon (default) or a user-defined separator, and each command run in turn.
+The script will be split by semicolon (default) or a user-defined separator, and each command run in turn.
 The output of the command has three components: header (in the form "\<RepoName\> | \<BranchName\>"), command, and results.
 Each section can be directed to the host, the pipeline, or suppressed.
 By default, the header, command, and results are only written when GitScript is used.
@@ -23,7 +24,7 @@ By default, the header, command, and results are only written when GitScript is 
 ```
 ## Check out a branch from outside a repository without naming a repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 PS C:\> Set-GitBranch -BranchName main
 
 # Nothing was returned because the current location is not inside a repository.
@@ -33,32 +34,33 @@ PS C:\> Set-GitBranch -BranchName main
 ```
 ## Call from outside a repository for non-existent repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName NonExistentRepo -BranchName main
-WARNING: [Set-GitBranch]Repository 'NonExistentRepo' not found. Check the repository directory has been added to the $GitRepoPath module variable.
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+PS C:\> Set-GitBranch -Repo NonExistentRepo -BranchName main
+WARNING: [Set-GitBranch]Repository 'NonExistentRepo' not found. Check the repository directory exists and has been added to the $Powdrgit.Path module variable.
 ```
 
 ### EXAMPLE 3
 ```
 ## Check out a branch from outside a repository by naming a repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName feature1
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName feature1
 
 # Nothing was returned, but the specified branch is now checked out for the specified repository.
 
 # To confirm the checkout:
-PS C:\> Get-GitBranch -RepoName MyToolbox -Current | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+PS C:\> Get-GitBranch -Repo MyToolbox -Current | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 RepoName  BranchName IsCheckedOut IsRemote
 --------  ---------- ------------ --------
 MyToolbox feature1           True    False
 
 # Checkout main branch:
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main
 
 # To confirm the checkout:
-PS C:\> Get-GitBranch -RepoName MyToolbox -Current | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+PS C:\> Get-GitBranch -Repo MyToolbox -Current | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 
 RepoName  BranchName IsCheckedOut IsRemote
 --------  ---------- ------------ --------
@@ -69,9 +71,9 @@ MyToolbox main               True    False
 ```
 ## Check out a branch from outside a repository and use SetLocation parameter ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation
-PS C:\PowdrgitExamples\MyToolbox\>
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation
+PS C:\PowdrgitExamples\MyToolbox>
 
 # Nothing was returned, but the specified branch is now checked out for the specified repository
 # Also, because the SetLocation switch was used, the current location (reflected in the prompt) changed to the repository's top-level directory.
@@ -81,8 +83,8 @@ PS C:\PowdrgitExamples\MyToolbox\>
 ```
 ## Check out a branch from outside a repository and use GitScript to run a git command against the branch ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -GitScript 'git pull'
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -GitScript 'git pull'
 MyToolbox | main
 git pull
 Already up to date.
@@ -92,9 +94,9 @@ Already up to date.
 ```
 ## Use GitScript to run a git command against a branch and capture the only the git output in a variable ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 PS C:\> $gitPullOutput = $null
-PS C:\> $gitPullOutput = Set-GitBranch -RepoName MyToolbox -BranchName main -GitScript 'git pull' -ResultsOut Pipe
+PS C:\> $gitPullOutput = Set-GitBranch -Repo MyToolbox -BranchName main -GitScript 'git pull' -ResultsOut Pipe
 MyToolbox | main
 git pull
 PS C:\> $gitPullOutput
@@ -107,8 +109,8 @@ Already up to date.
 ```
 ## Use GitScript to run a git command against a branch and suppress all output ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -GitScript 'git pull' -HeaderOut None -CommandOut None -ResultsOut None
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -GitScript 'git pull' -HeaderOut None -CommandOut None -ResultsOut None
 PS C:\>
 
 # No output was seen in the host as it was suppressed with the HeaderOut, CommandOut, and ResultsOut parameters.
@@ -118,9 +120,9 @@ PS C:\>
 ```
 ## Run a git command against multiple branches ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> $branchesToPull = Get-GitBranch -RepoName MyToolbox | Where-Object BranchName -in 'feature1','release' | Select-Object -ExpandProperty BranchName
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName $branchesToPull -GitScript 'git pull'
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $branchesToPull = Get-GitBranch -Repo MyToolbox | Where-Object BranchName -in 'feature1','release' | Select-Object -ExpandProperty BranchName
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName $branchesToPull -GitScript 'git pull'
 MyToolbox | feature1
 git pull
 Already up to date.
@@ -136,7 +138,7 @@ PS C:\>
 ```
 ## Run a git command against multiple branches in multiple repositories ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 PS C:\> Get-GitRepo | Get-GitBranch | Set-GitBranch -GitScript 'git status'
 MyToolbox | feature1
 git status
@@ -178,7 +180,9 @@ nothing to commit, working tree clean
 
 ### -BranchName
 The names of the branches to be checked out.
-These should match existing branches in the specified repository.
+Wildcard characters are allowed.
+The pattern will match against existing branches in the specified repository.
+A warning will be generated for any values that do not match the name of an existing branch.
 
 ```yaml
 Type: String[]
@@ -187,7 +191,7 @@ Aliases:
 
 Required: True
 Position: 2
-Default value: None
+Default value: *
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
@@ -213,8 +217,8 @@ Accept wildcard characters: False
 
 ### -GitScript
 Used to provide git commands that will be executed against the specified branches.
-The default command separator is the semi-colon (";").
-An alternative separator can be specified with the GitScriptSeparator parameter.
+The default command separator is the semicolon (";").
+An alternative separator can be specified with the GitScriptSeparator parameter or by setting $Powdrgit.DefaultGitScriptSeparator.
 A literal separator character can be specified with a backtick escape e.g. "\`;".
 
 ```yaml
@@ -232,7 +236,9 @@ Accept wildcard characters: False
 ### -GitScriptSeparator
 An alternative separator for splitting commands passed in to the GitScript parameter.
 If an empty string ('') or $null is passed in, no splitting will occur i.e. the script will execute as a single statement.
-The default separator is a semi-colon (";").
+The default separator is a semicolon (";").
+An empty of null value will treat the GitScript value as a single statement.
+The GitScriptSeparator parameter will override the value in $Powdrgit.DefaultGitScriptSeparator.
 
 ```yaml
 Type: String
@@ -241,7 +247,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: ;
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -265,21 +271,20 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RepoName
-The name of the git repository that has the specified branches.
-This should match the directory name of one of the repositories defined in the $GitRepoPath module variable.
-If there is no match, a warning is generated.
-When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+### -Repo
+The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+If the Repo parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+For examples of using the Repo parameter, refer to the help text for Get-GitRepo.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: RepoName, RepoPath
 
 Required: False
 Position: 1
 Default value: None
-Accept pipeline input: True (ByPropertyName, ByValue)
+Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
@@ -305,7 +310,7 @@ Accept wildcard characters: False
 
 ### -SetLocation
 Sets the working directory to the top-level directory of the specified repository.
-In the case where multiple RepoName values are passed in, the location will reflect the repository that was specified last.
+In the case where multiple Repo values are passed in, the location will reflect the repository that was specified last.
 
 ```yaml
 Type: SwitchParameter
@@ -319,6 +324,37 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Confirm
+Prompts you for confirmation before running the cmdlet.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: cf
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -WhatIf
+Shows what would happen if the cmdlet runs.
+The cmdlet is not run.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: wi
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
@@ -326,7 +362,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 [System.String]
 
-Accepts string objects via the RepoName parameter. The output of Get-GitBranch can be piped into Set-GitTag.
+Accepts string objects via the Repo parameter. The output of Get-GitBranch can be piped into Set-GitTag.
 
 ## OUTPUTS
 
@@ -334,19 +370,22 @@ Accepts string objects via the RepoName parameter. The output of Get-GitBranch c
 
 When output is present, returns String objects.
 
-
 ## NOTES
 Author : nmbell
 
 ## RELATED LINKS
 
-[about_powdrgit](about_powdrgit.md)
-
 [Get-GitBranch](Get-GitBranch.md)
 
 [Get-GitRepo](Get-GitRepo.md)
 
+[Set-GitRepo](Set-GitRepo.md)
+
+[Get-GitLog](Get-GitLog.md)
+
 [Invoke-GitExpression](Invoke-GitExpression.md)
+
+[about_powdrgit](about_powdrgit.md)
 
 
 

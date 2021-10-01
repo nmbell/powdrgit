@@ -2,6 +2,7 @@ class GitCommit
 {
 
 	[String]  $RepoName
+	[String]  $RepoPath
 	[String]  $SHA1Hash
 	[String]  $TreeHash
 	[String[]]$ParentHashes

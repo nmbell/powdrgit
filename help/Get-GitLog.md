@@ -1,4 +1,4 @@
-﻿# Get-GitLog
+# Get-GitLog
 
 ## SYNOPSIS
 Gets a list of commits from the git log.
@@ -7,12 +7,12 @@ Gets a list of commits from the git log.
 
 ### InRef (Default)
 ```
-Get-GitLog [[-RepoName] <String>] [-InRef <String[]>] [-NotInRef <String[]>] [-Count <Int32>] [-NoMerges] [<CommonParameters>]
+Get-GitLog [[-Repo] <String[]>] [-InRef <String[]>] [-NotInRef <String[]>] [-Count <Int32>] [-NoMerges] [<CommonParameters>]
 ```
 
 ### RefRange
 ```
-Get-GitLog [[-RepoName] <String>] [-RefRange <String[]>] [-Count <Int32>] [-NoMerges] [<CommonParameters>]
+Get-GitLog [[-Repo] <String[]>] [-RefRange <String[]>] [-Count <Int32>] [-NoMerges] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -24,19 +24,19 @@ Gets a list of commits from the git log.
 ```
 ## Call from outside a repository without parameters ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 PS C:\> Get-GitLog
 
-# Nothing was returned because a RepoName was not provided.
+# Nothing was returned because a Repo was not provided.
 ```
 
 ### EXAMPLE 2
 ```
-## Call from outside a repository with RepoName parameter ##
+## Call from outside a repository with Repo parameter ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main # checkout the main branch from the current location
-PS C:\> Get-GitLog -RepoName MyToolbox | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main # checkout the main branch from the current location
+PS C:\> Get-GitLog -Repo MyToolbox | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 RepoName  SHA1Hash                                 AuthorName Subject
 --------  --------                                 ---------- -------
@@ -52,9 +52,9 @@ MyToolbox 87b1320518c17702d30e463966bc070ce6481459 nmbell     Initial commit
 ```
 ## Get commits from the current repository ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitLog | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+PS C:\PowdrgitExamples\MyToolbox> Get-GitLog | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 RepoName  SHA1Hash                                 AuthorName Subject
 --------  --------                                 ---------- -------
@@ -68,9 +68,9 @@ MyToolbox 87b1320518c17702d30e463966bc070ce6481459 nmbell     Initial commit
 ```
 ## Call with Count parameter ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitLog -Count 3 | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+PS C:\PowdrgitExamples\MyToolbox> Get-GitLog -Count 3 | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 RepoName  SHA1Hash                                 AuthorName Subject
 --------  --------                                 ---------- -------
@@ -85,9 +85,9 @@ MyToolbox 3a987081541ca2f31f575d47287cb3fdf82a1135 nmbell     feature1 commit
 ```
 ## Call with NoMerges switch ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitLog -NoMerges | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+PS C:\PowdrgitExamples\MyToolbox> Get-GitLog -NoMerges | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 RepoName  SHA1Hash                                 AuthorName Subject
 --------  --------                                 ---------- -------
@@ -102,9 +102,9 @@ MyToolbox 87b1320518c17702d30e463966bc070ce6481459 nmbell     Initial commit
 ```
 ## Call with InRef and NotInRef ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitLog -InRef feature3 -NotInRef main | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+PS C:\PowdrgitExamples\MyToolbox> Get-GitLog -InRef feature3 -NotInRef main | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 RepoName  SHA1Hash                                 AuthorName Subject
 --------  --------                                 ---------- -------
@@ -117,9 +117,9 @@ MyToolbox 87e8501a197f8db5a54427c8a39803cf9e12ab66 nmbell     Add feature3_FileA
 ```
 ## Call with RefRange ##
 
-PS C:\> $GitRepoPath = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
-PS C:\> Set-GitBranch -RepoName MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
-PS C:\PowdrgitExamples\MyToolbox\> Get-GitLog -RefRange 'main..feature3' | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName main -SetLocation # move to the repository directory and checkout the main branch
+PS C:\PowdrgitExamples\MyToolbox> Get-GitLog -RefRange 'main..feature3' | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 RepoName  SHA1Hash                                 AuthorName Subject
 --------  --------                                 ---------- -------
@@ -150,7 +150,7 @@ Accept wildcard characters: False
 A list of repository references (i.e. branch names, tag names, or commit SHA1 hashes).
 Commits reachable from any of these references are included in the results.
 If ommitted, defaults to HEAD.
-See https://git-scm.com/docs/git-log#_description.
+For further details on how to specify a reference, see https://git-scm.com/docs/gitrevisions#_specifying_revisions.
 
 ```yaml
 Type: String[]
@@ -183,7 +183,7 @@ Accept wildcard characters: False
 A list of repository references (i.e. branch names, tag names, or commit SHA1 hashes).
 Commits reachable from any of these references are excluded from the results.
 If ommitted, defaults to HEAD.
-See https://git-scm.com/docs/git-log#_description.
+For further details on how to specify a reference, see https://git-scm.com/docs/gitrevisions#_specifying_revisions.
 
 ```yaml
 Type: String[]
@@ -199,7 +199,7 @@ Accept wildcard characters: False
 
 ### -RefRange
 A revision range used to limit the commits returned, given in native git format e.g. "branch1...branch2".
-See https://git-scm.com/docs/gitrevisions.
+For further details on how to specify a range, see https://git-scm.com/docs/gitrevisions#_specifying_ranges.
 
 ```yaml
 Type: String[]
@@ -213,21 +213,20 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RepoName
-The name of the git repository to return.
-This should match the directory name of one of the repositories defined in the $GitRepoPath module variable.
-If there is no match, a warning is generated.
-When the parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+### -Repo
+The name of a git repository, or the path or a substring of the path of a repository directory or any of its subdirectories or files.
+If the Repo parameter is omitted, the current repository will be used if currently inside a repository; otherwise, nothing is returned.
+For examples of using the Repo parameter, refer to the help text for Get-GitRepo.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: RepoName, RepoPath
 
 Required: False
 Position: 1
 Default value: None
-Accept pipeline input: True (ByPropertyName, ByValue)
+Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
@@ -238,7 +237,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 [System.String]
 
-Accepts string objects via the RepoName parameter. The output of Get-GitRepo can be piped into Get-GitLog.
+Accepts string objects via the Repo parameter. The output of Get-GitRepo can be piped into Get-GitLog.
 
 ## OUTPUTS
 
@@ -246,21 +245,22 @@ Accepts string objects via the RepoName parameter. The output of Get-GitRepo can
 
 Returns a custom GitCommit object. For details use Get-Member at a command prompt e.g.:
 
-`PS C:\PowdrgitExamples\MyToolbox> Get-GitLog | Get-Member -MemberType Properties`
-
+PS C:\PowdrgitExamples\MyToolbox> Get-GitLog | Get-Member -MemberType Properties
 
 ## NOTES
 Author : nmbell
 
 ## RELATED LINKS
 
-[about_powdrgit](about_powdrgit.md)
-
 [Get-GitCommit](Get-GitCommit.md)
 
 [Get-GitCommitFile](Get-GitCommitFile.md)
 
 [Get-GitFileHistory](Get-GitFileHistory.md)
+
+[Get-GitRepo](Get-GitRepo.md)
+
+[about_powdrgit](about_powdrgit.md)
 
 
 

@@ -2,6 +2,7 @@ class GitCommitFile
 {
 
 	[String] $RepoName
+	[String] $RepoPath
 	[String] $SHA1Hash
 	[String] $Action
 	[Bool]   $Exists
