@@ -13,15 +13,28 @@ function Get-ValidRepo
 	.PARAMETER FunctionName
 	Value to be displayed in the warning message.
 
+	.INPUTS
+	[System.String[]]
+	Accepts string objects via the Repo parameter.
+
+	.OUTPUTS
+	[GitRepo]
+	Returns a custom GitRepo object. The DirectoryInfo property contains the filesystem directory object for the repository.
+
 	.NOTES
 	Author : nmbell
 
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Use cmdlet binding
 	[CmdletBinding()]
+
+	# Declare output type
+	[OutputType('GitRepo')]
 
 	# Declare parameters
 	Param

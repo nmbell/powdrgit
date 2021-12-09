@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+	<ViewDefinitions>
+
+		<View>
+			<Name>powdrgit.GitCommitFile.TableView</Name>
+			<ViewSelectedBy>
+				<TypeName>GitCommitFile</TypeName>
+			</ViewSelectedBy>
+			<TableControl>
+				<AutoSize />
+				<TableHeaders>
+					<TableColumnHeader> <Label>RepoName</Label>         </TableColumnHeader>
+					<TableColumnHeader> <Label>SHA1Hash</Label>         </TableColumnHeader>
+					<TableColumnHeader> <Label>Action</Label>           </TableColumnHeader>
+					<TableColumnHeader> <Label>Exists</Label>           </TableColumnHeader>
+				    <TableColumnHeader> <Label>Name</Label>             </TableColumnHeader>
+					<TableColumnHeader> <Label>FullName</Label>         </TableColumnHeader>
+					<TableColumnHeader> <Label>RepoPath</Label>         </TableColumnHeader>
+				<!--<TableColumnHeader> <Label>Directory</Label>        </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>BaseName</Label>         </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>Extension</Label>        </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>PreviousFilePath</Label> </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>GitPath</Label>          </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>GitDirectory</Label>     </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>PreviousGitPath</Label>  </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>SimilarityPc</Label>     </TableColumnHeader>-->
+				</TableHeaders>
+				<TableRowEntries>
+					<TableRowEntry>
+						<TableColumnItems>
+							<TableColumnItem> <ScriptBlock> $_.RepoName                 </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.SHA1Hash.Substring(0,10) </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.Action                   </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.Exists                   </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.Name                     </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.FullName                 </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.RepoPath                 </ScriptBlock> </TableColumnItem>
+						<!--<TableColumnItem> <ScriptBlock> $_.Directory                </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.BaseName                 </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.Extension                </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.GitPath                  </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.GitDirectory             </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.PreviousFilePath         </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.SimilarityPc             </ScriptBlock> </TableColumnItem>-->
+						</TableColumnItems>
+					</TableRowEntry>
+				</TableRowEntries>
+			</TableControl>
+		</View>
+
+		<View>
+			<Name>powdrgit.GitCommitFile.ListView</Name>
+			<ViewSelectedBy>
+				<TypeName>GitCommitFile</TypeName>
+			</ViewSelectedBy>
+			<ListControl>
+				<ListEntries>
+					<ListEntry>
+						<ListItems>
+							<ListItem> <PropertyName>RepoName</PropertyName>         </ListItem>
+							<ListItem> <PropertyName>SHA1Hash</PropertyName>         </ListItem>
+							<ListItem> <PropertyName>Action</PropertyName>           </ListItem>
+							<ListItem> <PropertyName>Exists</PropertyName>           </ListItem>
+							<ListItem> <PropertyName>Name</PropertyName>             </ListItem>
+							<ListItem> <PropertyName>FullName</PropertyName>         </ListItem>
+							<ListItem> <PropertyName>RepoPath</PropertyName>         </ListItem>
+							<ListItem> <PropertyName>Directory</PropertyName>        </ListItem>
+							<ListItem> <PropertyName>BaseName</PropertyName>         </ListItem>
+							<ListItem> <PropertyName>Extension</PropertyName>        </ListItem>
+							<ListItem> <PropertyName>PreviousFilePath</PropertyName> </ListItem>
+							<ListItem> <PropertyName>GitPath</PropertyName>          </ListItem>
+							<ListItem> <PropertyName>GitDirectory</PropertyName>     </ListItem>
+							<ListItem> <PropertyName>PreviousGitPath</PropertyName>  </ListItem>
+							<ListItem> <PropertyName>SimilarityPc</PropertyName>     </ListItem>
+						</ListItems>
+					</ListEntry>
+				</ListEntries>
+			</ListControl>
+		</View>
+
+		<View>
+			<Name>powdrgit.GitCommitFile.WideView</Name>
+			<ViewSelectedBy>
+				<TypeName>GitCommitFile</TypeName>
+			</ViewSelectedBy>
+			<WideControl>
+				<WideEntries>
+					<WideEntry>
+						<WideItem> <PropertyName>Name</PropertyName> </WideItem>
+					</WideEntry>
+				</WideEntries>
+			</WideControl>
+		</View>
+
+	</ViewDefinitions>
+</Configuration>

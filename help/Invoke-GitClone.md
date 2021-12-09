@@ -280,9 +280,19 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
+[System.String]
+
+Accepts string objects via the RepoURL parameter.
 
 ## OUTPUTS
 
+[GitRepo]
+
+[System.IO.DirectoryInfo]
+
+Returns either a custom GitRepo object or a System.IO.DirectoryInfo object.
+
+The DirectoryInfo property of the GitRepo object contains the System.IO.DirectoryInfo object for the repository.
 
 ## NOTES
 Author : nmbell

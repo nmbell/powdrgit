@@ -72,7 +72,7 @@ function Get-GitCommitFile
 	# Commits with no files associated to them are included in the results.
 
 	.INPUTS
-	[System.String]
+	[System.String[]]
 	Accepts string objects via the SHA1Hash parameter. The output of Get-GitLog and Get-GitCommit can be piped into Get-GitCommitFile.
 
 	.OUTPUTS
@@ -93,6 +93,8 @@ function Get-GitCommitFile
 	Get-GitRepo
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -102,6 +104,9 @@ function Get-GitCommitFile
 	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitCommitFile.md'
 	)]
+
+	# Declare output type
+	[OutputType('GitCommitFile')]
 
 	# Declare parameters
 	Param(
@@ -208,6 +213,7 @@ function Get-GitCommitFile
 					$filePath1   = If ($linesplit.Count -gt 1) { $linesplit[1] } Else { $null }
 					$filePath2   = If ($linesplit.Count -gt 2) { $linesplit[2] } Else { $null }
 
+					$Matches = $null
 					$statusScore -match '(\w)(\d*)' | Out-Null
 					$status = $statusKey[$Matches[1]]
 					$score  = $Matches[2]

@@ -73,10 +73,15 @@ function Test-SubPath
 	Test-PowdrgitPath
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Use cmdlet binding
 	[CmdletBinding()]
+
+	# Declare output type
+	[OutputType([System.Boolean])]
 
 	# Declare parameters
 	Param

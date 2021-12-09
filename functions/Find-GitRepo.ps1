@@ -112,6 +112,8 @@ function Find-GitRepo
 	Test-PowdrgitPath
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -122,6 +124,9 @@ function Find-GitRepo
 	  DefaultParameterSetName = 'AppendPowdrgitPath'
 	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Find-GitRepo.md'
 	)]
+
+	# Declare output type
+	[OutputType([System.IO.DirectoryInfo], ParameterSetName = ('SetPowdrgitPath','AppendPowdrgitPath'))]
 
 	# Declare parameters
 	Param(
@@ -244,16 +249,17 @@ function Find-GitRepo
 		$gitReposAllCount = $gitReposAll | Select-Object -Unique | Measure-Object | Select-Object -ExpandProperty Count
 		Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found $('{0,3}' -f $gitReposAllCount) unique repositories total"
 
-		If ($SetPowdrgitPath -and $gitReposAll)
+		If ($gitReposAll)
 		{
-			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Setting `$Powdrgit.Path module variable"
-			$Powdrgit.Path = $null
-			Add-PowdrgitPath -Path $gitReposAll
-		}
-
-		If ($AppendPowdrgitPath -and $gitReposAll)
-		{
-			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Appending to `$Powdrgit.Path module variable"
+			If ($SetPowdrgitPath)
+			{
+				Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Setting `$Powdrgit.Path module variable"
+				$Powdrgit.Path = $null
+			}
+			If ($AppendPowdrgitPath)
+			{
+				Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Appending to `$Powdrgit.Path module variable"
+			}
 			Add-PowdrgitPath -Path $gitReposAll
 		}
 	}

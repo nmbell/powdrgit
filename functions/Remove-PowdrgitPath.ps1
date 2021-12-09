@@ -49,6 +49,14 @@ function Remove-PowdrgitPath
 
 	# Get-ChildItem is used here by way of example. Repository paths can also be retrieved using Get-GitRepo or Test-PowdrgitPath.
 
+	.INPUTS
+	[System.String[]]
+	Accepts string objects via the Path parameter.
+
+	.OUTPUTS
+	[System.Void]
+	The function does not return anything.
+
 	.NOTES
 	Author : nmbell
 
@@ -70,6 +78,8 @@ function Remove-PowdrgitPath
 	Invoke-GitClone
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -81,6 +91,9 @@ function Remove-PowdrgitPath
 	, ConfirmImpact         = 'Low'
 	, HelpURI               = 'https://github.com/nmbell/powdrgit/blob/main/help/Remove-PowdrgitPath.md'
 	)]
+
+	# Declare output type
+	[OutputType([System.Void])]
 
 	# Declare parameters
 	Param

@@ -135,7 +135,15 @@ function Invoke-GitClone
 
 	# The location was changed to the repository top-level folder.
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the RepoURL parameter.
+
 	.OUTPUTS
+	[GitRepo]
+	[System.IO.DirectoryInfo]
+	Returns either a custom GitRepo object or a System.IO.DirectoryInfo object.
+	The DirectoryInfo property of the GitRepo object contains the System.IO.DirectoryInfo object for the repository.
 
 	.NOTES
 	Author : nmbell
@@ -158,6 +166,8 @@ function Invoke-GitClone
 	Test-PowdrgitPath
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -170,6 +180,10 @@ function Invoke-GitClone
 	, ConfirmImpact           = 'Medium'
 	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Invoke-GitClone.md'
 	)]
+
+	# Declare output type
+	[OutputType('GitRepo'                , ParameterSetName = ('ParentDir','UseDefaultDir'))]
+	[OutputType([System.IO.DirectoryInfo], ParameterSetName = ('ParentDir','UseDefaultDir'))]
 
 	# Declare parameters
 	Param(
@@ -321,15 +335,14 @@ function Invoke-GitClone
 				$gitCommand = "git clone `"$gitCloneUrl`" `"$gitClonePath`""
 				Invoke-GitExpression -Command "$gitCommand --progress" `
 				| ForEach-Object {
-					$matches = $null
 					If ($_ -match "Cloning into '(.*)'...")
 					{
 						Write-Progress -Activity $gitCommand -Status ' ' -CurrentOperation $_ -PercentComplete $pc
 					}
 					ElseIf ($_ -match '^(remote|Receiving objects|Resolving deltas|Updating files):' )
 					{
-						$matches = $null
-						If($_ -match '(\d+)%') { $pc = $matches[1] }
+						$Matches = $null
+						If($_ -match '(\d+)%') { $pc = $Matches[1] }
 						Write-Progress -Activity $gitCommand -Status ' ' -CurrentOperation $_ -PercentComplete $pc
 					}
 					ElseIf ($_ -like 'fatal:*')

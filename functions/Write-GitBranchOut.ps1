@@ -16,15 +16,28 @@ function Write-GitBranchOut
 	.PARAMETER OutputStream
 	The stream to output to.
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the OutputValue parameter.
+
+	.OUTPUTS
+	[System.String]
+	When the OutputStream parameter is 'Pipe', returns String objects.
+
 	.NOTES
 	Author : nmbell
 
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Use cmdlet binding
 	[CmdletBinding()]
+
+	# Declare output type
+	[OutputType([System.String])]
 
 	# Suppress warnings from PSScriptAnalyzer
 	[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost","")]
@@ -80,6 +93,7 @@ function Write-GitBranchOut
 				{
 					$foregroundColor = 'Black'
 					If ($OutputStream -in 'Black','Blue','DarkBlue','DarkCyan','DarkGray','DarkGreen','DarkMagenta','DarkRed') { $foregroundColor = 'White' }
+					[Microsoft.PowerShell.PSConsoleReadLine]::ScrollDisplayDownLine() # https://github.com/PowerShell/PowerShell/issues/15130
 					Write-Host $OutputValue -ForegroundColor $foregroundColor -BackgroundColor $OutputStream
 				}
 				If ($OutputType -eq 'Command')

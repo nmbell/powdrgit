@@ -1,11 +1,41 @@
-﻿# Powdrgit 1.1.0
+﻿# Powdrgit 1.1.1
 
+[SHORT DESCRIPTION](#short-description)
+
+[LONG DESCRIPTION](#long-description)
+
+- [The module functions](#the-module-functions)
+
+[QUICK START GUIDE](#quick-start-guide)
+
+1. [Install the module.](#1-install-the-module)
+
+2. [Configure Powdrgit.](#2-configure-powdrgit)
+
+3. [Check the configuration.](#3-check-the-configuration)
+
+4. [Run your first command.](#4-run-your-first-command)
+
+[LEARNING THE COMMANDS](#learning-the-commands)
+
+[FURTHER CONFIGURATION](#further-configuration)
+
+[EXAMPLES](#examples)
+
+[GIT DOCUMENTATION](#git-documentation)
+
+[RELEASE HISTORY](#release-history)
+
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 
 ## SHORT DESCRIPTION
 **Powershell Driven Git**
 
 Powdrgit is a PowerShell module that makes it easy to work across repositories and branches.
 
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 
 ## LONG DESCRIPTION
 **Powershell Driven Git**
@@ -40,10 +70,12 @@ For repository management and Powdrgit configuration:
 - [Remove-PowdrgitPath](Remove-PowdrgitPath.md)
 - [Test-PowdrgitPath](Test-PowdrgitPath.md)
 
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 
 ## QUICK START GUIDE
 ### 1. Install the module.
-   The [module](https://www.powershellgallery.com/packages/powdrgit/1.1.0) is available through the [PowerShell Gallery](https://docs.microsoft.com/en-us/powershell/scripting/gallery/getting-started).
+   The [module](https://www.powershellgallery.com/packages/powdrgit/1.1.1) is available through the [PowerShell Gallery](https://docs.microsoft.com/en-us/powershell/scripting/gallery/getting-started).
    Run the following command in a PowerShell console to install the module:
    ```
    Install-Module -Name powdrgit -Force
@@ -100,6 +132,8 @@ For repository management and Powdrgit configuration:
    You should see the valid repositories that you just added to `$Powdrgit.Path`.
    The Powdrgit module always takes the name of the top-level repository directory as the repository name. It does not use values from a repository's config or origin URL as the name.
 
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 
 ## LEARNING THE COMMANDS
 Each function has numerous examples to help you understand how the function can be used and what results it provides. To view the help for any function, use PowerShell's built-in Get-Help function, e.g.:
@@ -114,6 +148,8 @@ The script is also available in the module folder at `powdrgit\scripts\PowdrgitH
 
 Note: the SHA1Hash values in the examples will be different to the ones you see on your own computer.
 
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 
 ## FURTHER CONFIGURATION
 Powdrgit has a module variable, `$Powdrgit`, that has various properties that can customize the behavior of Powdrgit:
@@ -142,6 +178,8 @@ Powdrgit has a module variable, `$Powdrgit`, that has various properties that ca
   - As described earlier, `$Powdrgit.Path` holds a semicolon separated list of repository paths. A repository's path needs to be in `$Powdrgit.Path` for the repository to be visible in Powdrgit.
   - Default is `$null`.
 
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 
 ## EXAMPLES
 Get a list of every local branch for every repository:
@@ -173,11 +211,30 @@ Capture all the output from a git command in a variable:
 $results = Invoke-GitExpression -Command 'git status'
 ```
 
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+
 ## GIT DOCUMENTATION
 Git reference documentation can be found [here](https://git-scm.com/docs).
 
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 
 ## RELEASE HISTORY
+### 1.1.1 (2021-12-09)
+- Add wide and list formats and separate format definitions into one file per class.
+- Update manifest so PowdrgitArgumentCompleters.ps1 does not appear in Get-Module results.
+- Add LicenseUri, ProjectUri, IconUri, and ReleaseNotes values to manifest.
+- Add logo file for PowerShellGallery.com.
+- Add contents listing and section dividers to about_powdrgit file.
+- Add link to online version of about_powdrgit in each function's help as a workaround for [16452](https://github.com/PowerShell/PowerShell/issues/16452).
+- Add .INPUTS and .OUTPUTS sections in each function's help.
+- Add OutputType declaration to each function.
+- Add call to ScrollDisplayDownLine in Write-GitBranchOut as a workaround for [15130](https://github.com/PowerShell/PowerShell/issues/15130).
+- Updates to .md files from Platyps.
+- Other minor code alterations.
+
+
 ### 1.1.0 (2021-10-01)
 - Add support for multiple repositories with the same name:
 	- Replace RepoName parameter with Repo parameter (with RepoName as an alias)

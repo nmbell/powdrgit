@@ -222,10 +222,15 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
+[System.String[]]
+
+Accepts string objects via the Repo parameter.
 
 ## OUTPUTS
 
-None.
+[System.Void]
+
+The function does not return anything.
 
 ## NOTES
 Author : nmbell

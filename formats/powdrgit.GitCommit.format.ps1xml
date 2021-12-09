@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+	<ViewDefinitions>
+
+		<View>
+			<Name>powdrgit.GitCommit.TableView</Name>
+			<ViewSelectedBy>
+				<TypeName>GitCommit</TypeName>
+			</ViewSelectedBy>
+			<TableControl>
+				<AutoSize />
+				<TableHeaders>
+					<TableColumnHeader> <Label>RepoName</Label>       </TableColumnHeader>
+					<TableColumnHeader> <Label>SHA1Hash</Label>       </TableColumnHeader>
+					<TableColumnHeader> <Label>IsMerge</Label>        </TableColumnHeader>
+					<TableColumnHeader> <Label>AuthorDate</Label>     </TableColumnHeader>
+					<TableColumnHeader> <Label>AuthorName</Label>     </TableColumnHeader>
+					<TableColumnHeader> <Label>Subject</Label>        </TableColumnHeader>
+					<TableColumnHeader> <Label>RefNames</Label>       </TableColumnHeader>
+					<TableColumnHeader> <Label>RepoPath</Label>       </TableColumnHeader>
+				<!--<TableColumnHeader> <Label>TreeHash</Label>       </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>ParentHashes</Label>   </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>AuthorEmail</Label>    </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>CommitterDate</Label>  </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>CommitterName</Label>  </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>CommitterEmail</Label> </TableColumnHeader>-->
+				<!--<TableColumnHeader> <Label>Body</Label>           </TableColumnHeader>-->
+				</TableHeaders>
+				<TableRowEntries>
+					<TableRowEntry>
+						<TableColumnItems>
+							<TableColumnItem> <ScriptBlock> $_.RepoName                                                      </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.SHA1Hash.Substring(0,10)                                      </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.IsMerge                                                       </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.AuthorDate.ToString('yyyy-MM-dd HH:mm:ss zzzz')               </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.AuthorName                                                    </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.Subject                                                       </ScriptBlock> </TableColumnItem>
+						    <TableColumnItem> <ScriptBlock> $_.RefNames[0]                                                   </ScriptBlock> </TableColumnItem>
+							<TableColumnItem> <ScriptBlock> $_.RepoPath                                                      </ScriptBlock> </TableColumnItem>
+						<!--<TableColumnItem> <ScriptBlock> $_.TreeHash.Substring(0,10)                                      </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.ParentHashes -join ','                                        </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.AuthorEmail                                                   </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.CommitterDate.ToString('yyyy-MM-dd HH:mm:ss zzzz')            </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.CommitterName                                                 </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.CommitterEmail                                                </ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> ($_.RefNames | Where-Object { $_ -notlike 'origin/*' }) -join ','</ScriptBlock> </TableColumnItem>-->
+						<!--<TableColumnItem> <ScriptBlock> $_.Body                                                          </ScriptBlock> </TableColumnItem>-->
+						</TableColumnItems>
+					</TableRowEntry>
+				</TableRowEntries>
+			</TableControl>
+		</View>
+
+		<View>
+			<Name>powdrgit.GitCommit.ListView</Name>
+			<ViewSelectedBy>
+				<TypeName>GitCommit</TypeName>
+			</ViewSelectedBy>
+			<ListControl>
+				<ListEntries>
+					<ListEntry>
+						<ListItems>
+							<ListItem> <PropertyName>RepoName</PropertyName>       </ListItem>
+							<ListItem> <PropertyName>SHA1Hash</PropertyName>       </ListItem>
+							<ListItem> <PropertyName>IsMerge</PropertyName>        </ListItem>
+							<ListItem> <PropertyName>AuthorDate</PropertyName>     </ListItem>
+							<ListItem> <PropertyName>AuthorName</PropertyName>     </ListItem>
+							<ListItem> <PropertyName>Subject</PropertyName>        </ListItem>
+							<ListItem> <PropertyName>RefNames</PropertyName>       </ListItem>
+							<ListItem> <PropertyName>RepoPath</PropertyName>       </ListItem>
+							<ListItem> <PropertyName>TreeHash</PropertyName>       </ListItem>
+							<ListItem> <PropertyName>ParentHashes</PropertyName>   </ListItem>
+							<ListItem> <PropertyName>AuthorEmail</PropertyName>    </ListItem>
+							<ListItem> <PropertyName>CommitterDate</PropertyName>  </ListItem>
+							<ListItem> <PropertyName>CommitterName</PropertyName>  </ListItem>
+							<ListItem> <PropertyName>CommitterEmail</PropertyName> </ListItem>
+							<ListItem> <PropertyName>Body</PropertyName>           </ListItem>
+						</ListItems>
+					</ListEntry>
+				</ListEntries>
+			</ListControl>
+		</View>
+
+		<View>
+			<Name>powdrgit.GitCommit.WideView</Name>
+			<ViewSelectedBy>
+				<TypeName>GitCommit</TypeName>
+			</ViewSelectedBy>
+			<WideControl>
+				<WideEntries>
+					<WideEntry>
+						<WideItem> <PropertyName>SHA1Hash</PropertyName> </WideItem>
+					</WideEntry>
+				</WideEntries>
+			</WideControl>
+		</View>
+
+	</ViewDefinitions>
+</Configuration>

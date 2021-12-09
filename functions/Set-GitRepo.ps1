@@ -68,7 +68,7 @@ function Set-GitRepo
 	# Note: in this case, the final location that is set will be the matching repository path that is last alphabetically.
 
 	.INPUTS
-	[System.String]
+	[System.String[]]
 	Accepts string objects via the Repo parameter.
 
 	.OUTPUTS
@@ -96,6 +96,8 @@ function Set-GitRepo
 	Test-PowdrgitPath
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -105,6 +107,9 @@ function Set-GitRepo
 	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Set-GitRepo.md'
 	)]
+
+	# Declare output type
+	[OutputType([System.IO.DirectoryInfo])]
 
 	# Declare parameters
 	Param(

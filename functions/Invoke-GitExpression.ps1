@@ -91,6 +91,8 @@ function Invoke-GitExpression
 	Invoke-GitClone
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -100,6 +102,9 @@ function Invoke-GitExpression
 	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Invoke-GitExpression.md'
 	)]
+
+	# Declare output type
+	[OutputType([System.String])]
 
 	# Declare parameters
 	Param

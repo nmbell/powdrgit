@@ -153,7 +153,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-[System.String]
+[System.String[]]
 
 Accepts string objects via the Repo parameter.
 

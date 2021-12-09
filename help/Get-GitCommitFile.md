@@ -120,7 +120,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-[System.String]
+[System.String[]]
 
 Accepts string objects via the SHA1Hash parameter. The output of Get-GitLog and Get-GitCommit can be piped into Get-GitCommitFile.
 

@@ -74,7 +74,7 @@ function Get-GitFileHistory
 	MyToolbox ebf9e4850f5e7023c052b90779abd56878c5215c nmbell      Add feature1_File1.txt
 
 	.INPUTS
-	[System.String]
+	[System.String[]]
 	Accepts string objects via the FilePath parameter. The output of Get-ChildItem can be piped into Get-GitFileHistory.
 
 	.OUTPUTS
@@ -95,6 +95,8 @@ function Get-GitFileHistory
 	Get-GitRepo
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -104,6 +106,9 @@ function Get-GitFileHistory
 	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitFileHistory.md'
 	)]
+
+	# Declare output type
+	[OutputType('GitCommit')]
 
 	# Declare parameters
 	Param(

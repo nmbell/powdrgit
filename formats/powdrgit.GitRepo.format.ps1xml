@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+	<ViewDefinitions>
+
+		<View>
+			<Name>powdrgit.GitRepo.TableView</Name>
+			<ViewSelectedBy>
+				<TypeName>GitRepo</TypeName>
+			</ViewSelectedBy>
+            <TableControl>
+				<AutoSize />
+                <TableHeaders>
+	                <TableColumnHeader> <Label>RepoName</Label>      <Alignment>Left</Alignment> </TableColumnHeader>
+	                <TableColumnHeader> <Label>RepoPath</Label>      <Alignment>Left</Alignment> </TableColumnHeader>
+                   	<TableColumnHeader> <Label>DirectoryInfo</Label> <Alignment>Left</Alignment> </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem> <ScriptBlock> $_.RepoName                         </ScriptBlock> </TableColumnItem>
+                            <TableColumnItem> <ScriptBlock> $_.RepoPath                         </ScriptBlock> </TableColumnItem>
+                            <TableColumnItem> <ScriptBlock> $_.DirectoryInfo.GetType().FullName </ScriptBlock> </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+		</View>
+
+		<View>
+			<Name>powdrgit.GitRepo.ListView</Name>
+			<ViewSelectedBy>
+				<TypeName>GitRepo</TypeName>
+			</ViewSelectedBy>
+			<ListControl>
+				<ListEntries>
+					<ListEntry>
+						<ListItems>
+							<ListItem> <Label>RepoName</Label>      <ScriptBlock> $_.RepoName                         </ScriptBlock> </ListItem>
+							<ListItem> <Label>RepoPath</Label>      <ScriptBlock> $_.RepoPath                         </ScriptBlock> </ListItem>
+							<ListItem> <Label>DirectoryInfo</Label> <ScriptBlock> $_.DirectoryInfo.GetType().FullName </ScriptBlock> </ListItem>
+						</ListItems>
+					</ListEntry>
+				</ListEntries>
+			</ListControl>
+		</View>
+
+		<View>
+			<Name>powdrgit.GitRepo.WideView</Name>
+			<ViewSelectedBy>
+				<TypeName>GitRepo</TypeName>
+			</ViewSelectedBy>
+			<WideControl>
+				<WideEntries>
+					<WideEntry>
+						<WideItem> <PropertyName>RepoName</PropertyName> </WideItem>
+					</WideEntry>
+				</WideEntries>
+			</WideControl>
+		</View>
+
+	</ViewDefinitions>
+</Configuration>

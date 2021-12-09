@@ -16,15 +16,28 @@ function ConvertTo-GitParsableResults
 	.PARAMETER EndOfText
 	Marker indicating the end of a line of text.
 
+	.INPUTS
+	[System.String]
+	Accepts string objects via the Line parameter.
+
+	.OUTPUTS
+	[System.String]
+	Returns String objects.
+
 	.NOTES
 	Author : nmbell
 
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Use cmdlet binding
 	[CmdletBinding()]
+
+	# Declare output type
+	[OutputType([System.String])]
 
 	# Declare parameters
 	Param

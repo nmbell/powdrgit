@@ -49,6 +49,14 @@ function Add-PowdrgitPath
 	# Get-ChildItem is used here by way of example. The preferred way to add repository paths is with Find-GitRepo, e.g.:
 	# Find-GitRepo -Path 'C:\PowdrgitExamples' -AppendPowdrgitPath
 
+	.INPUTS
+	[System.String[]]
+	Accepts string objects via the Path parameter.
+
+	.OUTPUTS
+	[System.Void]
+	The function does not return anything.
+
 	.NOTES
 	Author : nmbell
 
@@ -68,6 +76,8 @@ function Add-PowdrgitPath
 	Invoke-GitClone
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -79,6 +89,9 @@ function Add-PowdrgitPath
 	, ConfirmImpact         = 'Low'
 	, HelpURI               = 'https://github.com/nmbell/powdrgit/blob/main/help/Add-PowdrgitPath.md'
 	)]
+
+	# Declare output type
+	[OutputType([System.Void])]
 
 	# Declare parameters
 	Param

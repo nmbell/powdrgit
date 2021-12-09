@@ -1,6 +1,7 @@
-# powdrgit 1.1.0
+# powdrgit 1.1.1
 [CmdletBinding()]
 Param()
+
 
 # Include files
 . "$PSScriptRoot\classes\GitBranch.ps1"
@@ -40,7 +41,6 @@ Param()
 $moduleVars = Get-Content -Path "$PSScriptRoot\config\powdrgit.json" | ConvertFrom-Json
 New-Variable -Name Powdrgit -Value $moduleVars -Scope Script -Force
 New-Variable -Name PowdrgitCallDepth -Value 0 -Scope Script -Force
-
 
 
 # Aliases to export

@@ -67,7 +67,7 @@ function Get-GitTag
 	Project1  lightweightTag commit  Initial commit
 
 	.INPUTS
-	[System.String]
+	[System.String[]]
 	Accepts string objects via the Repo parameter. The output of Get-GitRepo can be piped into Get-GitTag.
 
 	.OUTPUTS
@@ -88,6 +88,8 @@ function Get-GitTag
 	Get-GitRepo
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -97,6 +99,9 @@ function Get-GitTag
 	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitTag.md'
 	)]
+
+	# Declare output type
+	[OutputType('GitTag')]
 
 	# Declare parameters
 	Param(

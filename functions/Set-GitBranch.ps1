@@ -197,7 +197,7 @@ function Set-GitBranch
 	# By piping the results of Get-GitRepo | Get-GitBranch into Set-GitBranch, we can see the status of all branches in all repositories in a single command.
 
 	.INPUTS
-	[System.String]
+	[System.String[]]
 	Accepts string objects via the Repo parameter. The output of Get-GitBranch can be piped into Set-GitTag.
 
 	.OUTPUTS
@@ -219,6 +219,8 @@ function Set-GitBranch
 	Invoke-GitExpression
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -230,6 +232,9 @@ function Set-GitBranch
 	, ConfirmImpact         = 'Medium'
 	, HelpURI               = 'https://github.com/nmbell/powdrgit/blob/main/help/Set-GitBranch.md'
 	)]
+
+	# Declare output type
+	[OutputType([System.String])]
 
 	# Declare parameters
 	Param(

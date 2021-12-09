@@ -121,7 +121,7 @@ function Get-GitConfigFile
 	# System, Global, and Portable config files are returned only once per call.
 
 	.INPUTS
-	[System.String]
+	[System.String[]]
 	Accepts string objects via the Repo parameter. The output of Get-GitRepo can be piped into Get-GitConfigFile.
 
 	.OUTPUTS
@@ -136,6 +136,8 @@ function Get-GitConfigFile
 	Get-GitRepo
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -145,6 +147,9 @@ function Get-GitConfigFile
 	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitConfigFile.md'
 	)]
+
+	# Declare output type
+	[OutputType('GitConfigFile')]
 
 	# Declare parameters
 	Param(

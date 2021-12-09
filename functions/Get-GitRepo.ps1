@@ -91,7 +91,7 @@ function Get-GitRepo
 	PS C:\>
 
 	.INPUTS
-	[System.String]
+	[System.String[]]
 	Accepts string objects via the Repo parameter.
 
 	.OUTPUTS
@@ -119,6 +119,8 @@ function Get-GitRepo
 	Test-PowdrgitPath
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -129,6 +131,9 @@ function Get-GitRepo
 	  DefaultParameterSetName = 'Repo'
 	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitRepo.md'
 	)]
+
+	# Declare output type
+	[OutputType('GitRepo')]
 
 	# Declare parameters
 	Param(

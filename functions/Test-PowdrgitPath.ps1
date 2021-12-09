@@ -164,6 +164,8 @@ function Test-PowdrgitPath
 	Invoke-GitClone
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -173,6 +175,10 @@ function Test-PowdrgitPath
 	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Test-PowdrgitPath.md'
 	)]
+
+	# Declare output type
+	[OutputType([System.Int32])]
+	[OutputType([System.String])]
 
 	# Declare parameters
 	Param(

@@ -73,7 +73,7 @@ function Get-GitCommit
 	# PS C:\PowdrgitExamples\MyToolbox> Get-GitLog | Format-Table -Property RepoName,SHA1Hash,AuthorName,Subject
 
 	.INPUTS
-	[System.String]
+	[System.String[]]
 	Accepts string objects via the SHA1Hash parameter. The output of Get-GitLog can be piped into Get-GitCommit.
 
 	.OUTPUTS
@@ -94,6 +94,8 @@ function Get-GitCommit
 	Get-GitRepo
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -103,6 +105,9 @@ function Get-GitCommit
 	[CmdletBinding(
 	  HelpURI = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitCommit.md'
 	)]
+
+	# Declare output type
+	[OutputType('GitCommit')]
 
 	# Declare parameters
 	Param(

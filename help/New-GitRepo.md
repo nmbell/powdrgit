@@ -349,8 +349,15 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
+[System.String[]]
+
+Accepts string objects via the Repo parameter.
 
 ## OUTPUTS
+
+[GitRepo]
+
+[System.IO.DirectoryInfo]
 
 If the AppendPowdrgitPath switch was used, then a [GitRepo] object is returned. Otherwise a [System.IO.DirectoryInfo] object is returned.
 

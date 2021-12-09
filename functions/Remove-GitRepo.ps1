@@ -125,8 +125,13 @@ function Remove-GitRepo
 	PS C:\> Test-Path -Path $repoDir
 	False
 
+	.INPUTS
+	[System.String[]]
+	Accepts string objects via the Repo parameter.
+
 	.OUTPUTS
-	None.
+	[System.Void]
+	The function does not return anything.
 
 	.NOTES
 	Author : nmbell
@@ -149,6 +154,8 @@ function Remove-GitRepo
 	Test-PowdrgitPath
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -160,6 +167,9 @@ function Remove-GitRepo
 	, ConfirmImpact         = 'High'
 	, HelpURI               = 'https://github.com/nmbell/powdrgit/blob/main/help/Remove-GitRepo.md'
 	)]
+
+	# Declare output type
+	[OutputType([System.Void])]
 
 	# Declare parameters
 	Param(

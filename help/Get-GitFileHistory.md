@@ -123,7 +123,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-[System.String]
+[System.String[]]
 
 Accepts string objects via the FilePath parameter. The output of Get-ChildItem can be piped into Get-GitFileHistory.
 

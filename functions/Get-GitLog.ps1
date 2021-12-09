@@ -127,7 +127,7 @@ function Get-GitLog
 	# Equivalent to the previous example.
 
 	.INPUTS
-	[System.String]
+	[System.String[]]
 	Accepts string objects via the Repo parameter. The output of Get-GitRepo can be piped into Get-GitLog.
 
 	.OUTPUTS
@@ -148,6 +148,8 @@ function Get-GitLog
 	Get-GitRepo
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -158,6 +160,9 @@ function Get-GitLog
 	  DefaultParameterSetName = 'InRef'
 	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitLog.md'
 	)]
+
+	# Declare output type
+	[OutputType('GitCommit')]
 
 	# Declare parameters
 	Param(

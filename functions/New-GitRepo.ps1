@@ -161,7 +161,13 @@ function New-GitRepo
 
 	# Note that git copies files from with working directory of the template repository to the git directory of the new repository.
 
+	.INPUTS
+	[System.String[]]
+	Accepts string objects via the Repo parameter.
+
 	.OUTPUTS
+	[GitRepo]
+	[System.IO.DirectoryInfo]
 	If the AppendPowdrgitPath switch was used, then a [GitRepo] object is returned. Otherwise a [System.IO.DirectoryInfo] object is returned.
 
 	.NOTES
@@ -185,6 +191,8 @@ function New-GitRepo
 	Test-PowdrgitPath
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -197,6 +205,10 @@ function New-GitRepo
 	, ConfirmImpact           = 'Medium'
 	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/New-GitRepo.md'
 	)]
+
+	# Declare output type
+	[OutputType('GitRepo'                , ParameterSetName = ('Bare','InitialCommit','UseDefaultInitialCommit'))]
+	[OutputType([System.IO.DirectoryInfo], ParameterSetName = ('Bare','InitialCommit','UseDefaultInitialCommit'))]
 
 	# Declare parameters
 	Param(

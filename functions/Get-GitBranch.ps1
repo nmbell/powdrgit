@@ -217,7 +217,7 @@ function Get-GitBranch
 	Project1  newfeature         True    False C:\PowdrgitExamples\Project1
 
 	.INPUTS
-	[System.String]
+	[System.String[]]
 	Accepts string objects via the Repo parameter. The output of Get-GitRepo can be piped into Get-GitBranch.
 
 	.OUTPUTS
@@ -238,6 +238,8 @@ function Get-GitBranch
 	Get-GitTag
 	.LINK
 	about_powdrgit
+	.LINK
+	https://github.com/nmbell/powdrgit/blob/main/help/about_powdrgit.md
 	#>
 
 	# Function alias
@@ -248,6 +250,9 @@ function Get-GitBranch
 	  DefaultParameterSetName = 'Remote'
 	, HelpURI                 = 'https://github.com/nmbell/powdrgit/blob/main/help/Get-GitBranch.md'
 	)]
+
+	# Declare output type
+	[OutputType('GitBranch', ParameterSetName = ('Current','CurrentFirst','CurrentLast','Remote'))]
 
 	# Declare parameters
 	Param(
