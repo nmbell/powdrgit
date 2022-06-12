@@ -1,4 +1,4 @@
-# Powdrgit 1.1.1
+# Powdrgit 1.1.2
 
 [SHORT DESCRIPTION](#short-description)
 
@@ -75,7 +75,7 @@ For repository management and Powdrgit configuration:
 
 ## QUICK START GUIDE
 ### 1. Install the module.
-   The [module](https://www.powershellgallery.com/packages/powdrgit/1.1.1) is available through the [PowerShell Gallery](https://docs.microsoft.com/en-us/powershell/scripting/gallery/getting-started).
+   The [module](https://www.powershellgallery.com/packages/powdrgit/1.1.2) is available through the [PowerShell Gallery](https://docs.microsoft.com/en-us/powershell/scripting/gallery/getting-started).
    Run the following command in a PowerShell console to install the module:
    ```
    Install-Module -Name powdrgit -Force
@@ -221,6 +221,13 @@ Git reference documentation can be found [here](https://git-scm.com/docs).
 ----------------------------------------------------------------------------------------------------
 
 ## RELEASE HISTORY
+### 1.1.2 (2022-06-11)
+- Update logo file path for PowerShellGallery.com.
+- Update functions:
+  - Invoke-GitClone:
+    - Fix logic bug for determining RepoName when it contains '.git'
+
+
 ### 1.1.1 (2021-12-09)
 - Add wide and list formats and separate format definitions into one file per class.
 - Update manifest so PowdrgitArgumentCompleters.ps1 does not appear in Get-Module results.

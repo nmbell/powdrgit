@@ -312,7 +312,7 @@ function Invoke-GitClone
 			}
 			If (!$PSBoundParameters.ContainsKey('RepoName'))
 			{
-				$RepoName = (Split-Path -Path $gitCloneUrl -Leaf).Replace('.git','')
+				$RepoName = (Split-Path -Path $gitCloneUrl -Leaf) -replace '\.git$',''
 			}
 			$gitClonePath = Join-Path -Path $gitClonePath -ChildPath $RepoName
 			If (!$gitClonePath)
