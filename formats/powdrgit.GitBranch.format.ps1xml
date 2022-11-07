@@ -17,6 +17,7 @@
 					<TableColumnHeader> <Label>IsRemote</Label>        </TableColumnHeader>
 					<TableColumnHeader> <Label>Upstream</Label>        </TableColumnHeader>
 					<TableColumnHeader> <Label>RepoPath</Label>        </TableColumnHeader>
+				<!--<TableColumnHeader> <Label>BranchLeafName</Label>  </TableColumnHeader>-->
 				<!--<TableColumnHeader> <Label>BranchFullName</Label>  </TableColumnHeader>-->
 				<!--<TableColumnHeader> <Label>UpstreamFullName</Label></TableColumnHeader>-->
 				</TableHeaders>
@@ -30,6 +31,7 @@
 							<TableColumnItem> <ScriptBlock> $_.IsRemote                 </ScriptBlock> </TableColumnItem>
 							<TableColumnItem> <ScriptBlock> $_.Upstream                 </ScriptBlock> </TableColumnItem>
 							<TableColumnItem> <ScriptBlock> $_.RepoPath                 </ScriptBlock> </TableColumnItem>
+						<!--<TableColumnItem> <ScriptBlock> $_.BranchLeafName           </ScriptBlock> </TableColumnItem>-->
 						<!--<TableColumnItem> <ScriptBlock> $_.BranchFullName           </ScriptBlock> </TableColumnItem>-->
 						<!--<TableColumnItem> <ScriptBlock> $_.UpstreamFullName         </ScriptBlock> </TableColumnItem>-->
 						</TableColumnItems>
@@ -48,13 +50,14 @@
 					<ListEntry>
 						<ListItems>
 							<ListItem> <PropertyName>RepoName</PropertyName>         </ListItem>
+							<ListItem> <PropertyName>RepoPath</PropertyName>         </ListItem>
 							<ListItem> <PropertyName>SHA1Hash</PropertyName>         </ListItem>
 							<ListItem> <PropertyName>BranchName</PropertyName>       </ListItem>
 							<ListItem> <PropertyName>IsCheckedOut</PropertyName>     </ListItem>
 							<ListItem> <PropertyName>IsRemote</PropertyName>         </ListItem>
-							<ListItem> <PropertyName>Upstream</PropertyName>         </ListItem>
-							<ListItem> <PropertyName>RepoPath</PropertyName>         </ListItem>
+							<ListItem> <PropertyName>BranchLeafName</PropertyName>   </ListItem>
 							<ListItem> <PropertyName>BranchFullName</PropertyName>   </ListItem>
+							<ListItem> <PropertyName>Upstream</PropertyName>         </ListItem>
 							<ListItem> <PropertyName>UpstreamFullName</PropertyName> </ListItem>
 						</ListItems>
 					</ListEntry>

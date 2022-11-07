@@ -1,4 +1,4 @@
-# powdrgit 1.1.2
+# powdrgit 1.2.0
 [CmdletBinding()]
 Param()
 
@@ -14,6 +14,7 @@ Param()
 . "$PSScriptRoot\functions\Add-PowdrgitPath.ps1"
 . "$PSScriptRoot\functions\ConvertTo-GitParsableResults.ps1"
 . "$PSScriptRoot\functions\Find-GitRepo.ps1"
+. "$PSScriptRoot\functions\Get-ChildDirs.ps1"
 . "$PSScriptRoot\functions\Get-GitBranch.ps1"
 . "$PSScriptRoot\functions\Get-GitCommit.ps1"
 . "$PSScriptRoot\functions\Get-GitCommitFile.ps1"
@@ -78,6 +79,7 @@ $FunctionsToExport =
 	'Add-PowdrgitPath'
 	'Find-GitRepo'
 	'Get-GitBranch'
+	# 'Get-ChildDirs'
 	'Get-GitCommit'
 	'Get-GitCommitFile'
 	'Get-GitConfigFile'

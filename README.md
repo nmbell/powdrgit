@@ -1,4 +1,4 @@
-# Powdrgit 1.1.2
+# Powdrgit 1.2.0
 
 [SHORT DESCRIPTION](#short-description)
 
@@ -75,7 +75,7 @@ For repository management and Powdrgit configuration:
 
 ## QUICK START GUIDE
 ### 1. Install the module.
-   The [module](https://www.powershellgallery.com/packages/powdrgit/1.1.2) is available through the [PowerShell Gallery](https://docs.microsoft.com/en-us/powershell/scripting/gallery/getting-started).
+   The [module](https://www.powershellgallery.com/packages/powdrgit/1.2.0) is available through the [PowerShell Gallery](https://docs.microsoft.com/en-us/powershell/scripting/gallery/getting-started).
    Run the following command in a PowerShell console to install the module:
    ```
    Install-Module -Name powdrgit -Force
@@ -221,6 +221,22 @@ Git reference documentation can be found [here](https://git-scm.com/docs).
 ----------------------------------------------------------------------------------------------------
 
 ## RELEASE HISTORY
+### 1.2.0 (2022-11-06)
+- Update functions:
+	- Find-GitRepo:
+		- Include RecurseJunction switch to control recursion into junction points
+	- Get-GitCommit:
+		- Update commit message handling to tolerate special characters
+	- Get-GitBranch:
+		- Update BranchName to show the complete branch name when the branch name includes slashes
+		- Include BranchLeafName in output, which has only the part of the branch name after the last slash
+		- Update branch name handling to tolerate special characters
+		- Include two new module variable attributes to control filtering of results:
+			- $Powdrgit.BranchExcludes allows branches to be excluded from results
+			- $Powdrgit.BranchExcludesNoWarn controls suppression of warning messages about the number of branches excluded due to filtering
+- Update array handling for performance
+
+
 ### 1.1.2 (2022-06-11)
 - Update logo file path for PowerShellGallery.com.
 - Update functions:
@@ -319,4 +335,3 @@ Git reference documentation can be found [here](https://git-scm.com/docs).
 
 ### 1.0.0 (2021-04-12)
   - Initial release
-

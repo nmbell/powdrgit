@@ -234,6 +234,23 @@ MyToolbox feature3          False    False C:\PowdrgitExamples\MyToolbox
 Project1  newfeature         True    False C:\PowdrgitExamples\Project1
 ```
 
+### EXAMPLE 14
+```
+## Hide branches from results using $Powdrgit.BranchExcludes ##
+
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+PS C:\> $Powdrgit.BranchExcludesNoWarn = $false # to ensure warnings are visible
+PS C:\> $Powdrgit.BranchExcludes += [PSCustomObject]@{ RepoPattern = '.*'; BranchPattern = 'feature\d'; ApplyTo = 'Local' }
+PS C:\> Get-GitBranch -Repo MyToolbox | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+WARNING: [Get-GitBranch]Branches excluded due to conditions in $Powdrgit.BranchExcludes: 4
+
+RepoName  BranchName IsCheckedOut IsRemote
+--------  ---------- ------------ --------
+MyToolbox main               True    False
+MyToolbox release           False    False
+```
+
 ## PARAMETERS
 
 ### -BranchName
@@ -241,6 +258,16 @@ The names of the branches to be checked out.
 Wildcard characters are allowed.
 The pattern will match against existing branches in the specified repository.
 A warning will be generated for any values that do not match the name of an existing branch.
+Branches can be suppressed from results on either a global, local only, or remote only basis using by setting the $Powdrgit.BranchExcludes value (see examples).
+RepoPattern is a regular expression evaluated against RepoName to identify repositories that the filter will be applied to.
+BranchPattern is a regular expression evaluated against BranchFullName to identify branches that will be excluded from results.
+ApplyTo can be used to limit the filtering to either local branches, remote branches, or either.
+Valid ApplyTo values are: 'Local', 'Remote', or 'Global.
+An empty string or $null is equivalent to 'Global'.
+Any other value will cause the filter to be ignored.
+Multiple filters can be defined, and all filters that match a given repository will be applied.
+By default, when a filter causes exclusion of branches from the results a warning will be displayed.
+This can be suppressed by setting $Powdrgit.BranchExcludesNoWarn = $true.
 
 ```yaml
 Type: String[]

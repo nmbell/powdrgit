@@ -137,9 +137,9 @@ function Remove-PowdrgitPath
 		Try
 		{
 			# Construct the new Path value
-			$existPaths = @()
-			$inputPaths = @()
-			$newPaths   = @()
+			$existPaths = New-Object -TypeName System.Collections.ArrayList
+			$inputPaths = New-Object -TypeName System.Collections.ArrayList
+			$newPaths   = New-Object -TypeName System.Collections.ArrayList
 			$existPaths += ($Powdrgit.Path -split ';')              | ForEach-Object { $_.Trim() } | Where-Object { ![String]::IsNullOrEmpty($_) } | Select-Object -Unique
 			$inputPaths += $Path | ForEach-Object { $_ -split ';' } | ForEach-Object { $_.Trim() } | Where-Object { ![String]::IsNullOrEmpty($_) } | Select-Object -Unique
 			$newPaths   += $existPaths | Where-Object { $_ -notin $inputPaths } | Select-Object -Unique | Sort-Object

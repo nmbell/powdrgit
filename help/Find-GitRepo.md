@@ -7,12 +7,12 @@ Finds all git repositories that exist under the specifed directory.
 
 ### AppendPowdrgitPath (Default)
 ```
-Find-GitRepo [[-Path] <String[]>] [-Recurse] [-AppendPowdrgitPath] [<CommonParameters>]
+Find-GitRepo [[-Path] <String[]>] [-Recurse] [-RecurseJunction] [-AppendPowdrgitPath] [<CommonParameters>]
 ```
 
 ### SetPowdrgitPath
 ```
-Find-GitRepo [[-Path] <String[]>] [-Recurse] [-SetPowdrgitPath] [<CommonParameters>]
+Find-GitRepo [[-Path] <String[]>] [-Recurse] [-RecurseJunction] [-SetPowdrgitPath] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -131,6 +131,22 @@ Accept wildcard characters: False
 
 ### -Recurse
 Search subdirectories of the specifed directory.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -RecurseJunction
+Search subdirectories of any junction points.
+Implies Recurse.
 
 ```yaml
 Type: SwitchParameter

@@ -79,7 +79,7 @@ function Get-ValidRepo
 		Try
 		{
 			# Get the repository info
-			$validRepos = @()
+			$validRepos = New-Object -TypeName System.Collections.ArrayList
 			$matchCounts = $null
 			$validRepos += Get-GitRepo -Repo $Repo -InformationVariable matchInfo
 

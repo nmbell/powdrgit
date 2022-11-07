@@ -169,7 +169,7 @@ function Get-GitRepo
 		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Start: $($start.ToString('yyyy-MM-dd HH:mm:ss.fff'))"
 
 		# Function BEGIN:
-		$outputPaths = @()
+		$outputPaths = New-Object -TypeName System.Collections.ArrayList
 
 		# Get list of all valid repository paths
 		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Getting list of repositories from the `$Powdrgit.Path module variable:"

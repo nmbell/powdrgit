@@ -7,8 +7,9 @@ class GitBranch
 	[String]$BranchName
 	[Bool]  $IsCheckedOut
 	[Bool]  $IsRemote
-	[String]$Upstream
+	[String]$BranchLeafName
 	[String]$BranchFullName
+	[String]$Upstream
 	[String]$UpstreamFullName
 
 	[String]ToString(){ Return $this.BranchName }

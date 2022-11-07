@@ -15,6 +15,10 @@ function Find-GitRepo
 	.PARAMETER Recurse
 	Search subdirectories of the specifed directory.
 
+	.PARAMETER RecurseJunction
+	Search subdirectories of any junction points.
+	Implies Recurse.
+
 	.PARAMETER SetPowdrgitPath
 	Populates the $Powdrgit.Path module variable with a list of the paths for all found repositories.
 
@@ -144,6 +148,9 @@ function Find-GitRepo
 	,	[Switch]
 		$Recurse
 
+	,	[Switch]
+		$RecurseJunction
+
 	,	[Parameter(
 		  Mandatory        = $false
 		, ParameterSetName = 'SetPowdrgitPath'
@@ -191,11 +198,11 @@ function Find-GitRepo
 			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Setting root directory list to $Path"
 		}
 
-		$gitReposAll = @()
+		$gitReposAll = New-Object -TypeName System.Collections.ArrayList
 
 		ForEach ($_path in $Path)
 		{
-			$gitReposDir = @()
+			$gitReposDir = New-Object -TypeName System.Collections.ArrayList
 
 			If (!(Test-Path -Path $_path))
 			{
@@ -206,8 +213,8 @@ function Find-GitRepo
 				Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Looking for git repositories under $_path"
 
 				# .git repositories
-				$gitRepos = @()
-				$gitRepos = Get-ChildItem -Path $_path -Directory -Recurse:$Recurse -ErrorAction Ignore `
+				$gitRepos = New-Object -TypeName System.Collections.ArrayList
+				$gitRepos = Get-ChildDirs -Path $_path -Recurse:$Recurse -RecurseJunction:$RecurseJunction -ErrorAction Ignore `
 							| Where-Object { $_.FullName -notlike '*\$RECYCLE.BIN\*' } `
 							| Where-Object { Test-Path -Path "$($_.FullName)\.git" } `
 							| Select-Object -ExpandProperty FullName `
@@ -219,8 +226,8 @@ function Find-GitRepo
 				}
 
 				# Bare repositories
-				$gitRepos = @()
-				$gitRepos = Get-ChildItem -Path $_path -Directory -Recurse:$Recurse -Filter '*.git' -ErrorAction Ignore `
+				$gitRepos = New-Object -TypeName System.Collections.ArrayList
+				$gitRepos = Get-ChildDirs -Path $_path -Filter '*.git' -Recurse:$Recurse -RecurseJunction:$RecurseJunction -ErrorAction Ignore `
 							| Select-Object -ExpandProperty FullName `
 							| Where-Object { $_ -notin $gitReposDir }
 				If ($gitRepos)
@@ -230,7 +237,7 @@ function Find-GitRepo
 				}
 
 				# The root directory itself
-				$gitRepos = @()
+				$gitRepos = New-Object -TypeName System.Collections.ArrayList
 				$gitRepos = Get-Item -Path $_path -ErrorAction Ignore `
 							| Where-Object { (Test-Path -Path "$($_.FullName)\.git") -or ($_.PSIsContainer -eq $true -and $_.Name -like '*.git') } `
 							| Select-Object -ExpandProperty FullName `

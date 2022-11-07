@@ -237,9 +237,10 @@ function Get-GitLog
 		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finding current location"
 		$startLocation = $PWD.Path
 
-		$startOfText = '!!>>' # commit info delimiter
-		$endOfText   = '<<!!' # commit info delimiter
-		$gitCommandTemplate = 'git log <InRef><NotInRef><Count><NoMerges>--date=iso8601-strict-local --format="'+$startOfText+'%H|%T|%P|%ad|%an|%ae|%cd|%cn|%ce|%D|%s|%b'+$endOfText+'"' # https://git-scm.com/docs/git-log#_pretty_formats
+		$startOfText = '!!>>'   # commit info delimiter
+		$endOfText   = '<<!!'   # commit info delimiter
+		$separator   = [char]30 # ASCII Record Separator
+		$gitCommandTemplate = 'git log <InRef><NotInRef><Count><NoMerges>--date=iso8601-strict-local --format="'+$startOfText+'%H'+$separator+'%T'+$separator+'%P'+$separator+'%ad'+$separator+'%an'+$separator+'%ae'+$separator+'%cd'+$separator+'%cn'+$separator+'%ce'+$separator+'%D'+$separator+'%s'+$separator+'%b'+$endOfText+'"' # https://git-scm.com/docs/git-log#_pretty_formats
 	}
 
 	PROCESS
@@ -290,7 +291,7 @@ function Get-GitLog
 			{
 				ForEach ($line in $gitResults | Where-Object { $_.Trim() })
 				{
-					$lineSplit = $line.Replace($startOfText,'').Replace($endOfText,'').Split('|')
+					$lineSplit = $line.Replace($startOfText,'').Replace($endOfText,'').Split($separator)
 
 					# Output
 					[GitCommit]@{

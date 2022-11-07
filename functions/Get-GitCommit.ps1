@@ -151,9 +151,10 @@ function Get-GitCommit
 		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Storing current location"
 		$startLocation = $PWD.Path
 
-		$startOfText = '!!>>' # commit info delimiter
-		$endOfText   = '<<!!' # commit info delimiter
-		$gitCommandTemplate = 'git show <SHA1Hash> --no-patch --date=iso8601-strict-local --format=format:"'+$startOfText+'%H|%T|%P|%ad|%an|%ae|%cd|%cn|%ce|%D|%s|%b'+$endOfText+'"' # https://git-scm.com/docs/git-show#_pretty_formats
+		$startOfText = '!!>>'   # commit info delimiter
+		$endOfText   = '<<!!'   # commit info delimiter
+		$separator   = [char]30 # ASCII Record Separator
+		$gitCommandTemplate = 'git show <SHA1Hash> --no-patch --date=iso8601-strict-local --format=format:"'+$startOfText+'%H'+$separator+'%T'+$separator+'%P'+$separator+'%ad'+$separator+'%an'+$separator+'%ae'+$separator+'%cd'+$separator+'%cn'+$separator+'%ce'+$separator+'%D'+$separator+'%s'+$separator+'%b'+$endOfText+'"' # https://git-scm.com/docs/git-show#_pretty_formats
 	}
 
 	PROCESS
@@ -191,7 +192,7 @@ function Get-GitCommit
 			# Parse the results
 			If ($gitResults)
 			{
-				$lineSplit = $gitResults.Split('|')
+				$lineSplit = $gitResults.Split($separator)
 
 				# Output
 				[GitCommit]@{

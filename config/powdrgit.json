@@ -1,5 +1,7 @@
 {
 	"AutoCompleteFullPaths"     : false
+,	"BranchExcludes"            : [{ "RepoPattern": "", "BranchPattern": "", "ApplyTo": "" }]
+,	"BranchExcludesNoWarn"      : false
 ,	"DebugIndentChar"           : ">"
 ,	"DefaultCloneUrl"           : null
 ,	"DefaultDir"                : null

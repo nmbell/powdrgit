@@ -65,7 +65,17 @@ $argumentCompleter =
 	}
 	Get-GitBranch -Repo $argRepo -IncludeRemote -WarningAction Ignore -Debug:$false `
 	| Select-Object -ExpandProperty BranchName `
-	| Where-Object { $_ -like "$wordToComplete*" }
+	| Where-Object { $_ -like "$wordToComplete*" } `
+	| ForEach-Object {
+		If ($_ -match '[^\w-/]')
+		{
+			If ($_ -match "'") { "`"$_`"" } Else { "'$_'" }
+		}
+		Else
+		{
+			$_
+		}
+	}
 }
 Register-ArgumentCompleter -CommandName 'Set-GitBranch' -ParameterName BranchName -ScriptBlock $argumentCompleter
 
