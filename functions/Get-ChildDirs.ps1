@@ -84,7 +84,7 @@ function Get-ChildDirs
 
 	PROCESS
 	{
-		ForEach ($dir in Get-ChildItem -Path $Path -Directory -ErrorAction Ignore)
+		ForEach ($dir in Get-ChildItem -LiteralPath $Path -Directory -ErrorAction Ignore)
 		{
 			# Return the current item
 			If (!$Filter -or ($Filter -and $dir.Name -like $Filter))

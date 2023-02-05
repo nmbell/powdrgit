@@ -1,4 +1,4 @@
-﻿# Powdrgit 1.2.0
+﻿# Powdrgit 1.3.0
 
 [SHORT DESCRIPTION](#short-description)
 
@@ -59,6 +59,8 @@ For working inside a repository:
 - [Get-GitLog](Get-GitLog.md)
 - [Get-GitTag](Get-GitTag.md)
 - [Invoke-GitExpression](Invoke-GitExpression.md)
+- [Get-GitDiff](Get-GitDiff.md)
+- [Format-GitDiff](Format-GitDiff.md)
 
 For repository management and Powdrgit configuration:
 - [New-GitRepo](New-GitRepo.md)
@@ -75,7 +77,7 @@ For repository management and Powdrgit configuration:
 
 ## QUICK START GUIDE
 ### 1. Install the module.
-   The [module](https://www.powershellgallery.com/packages/powdrgit/1.2.0) is available through the [PowerShell Gallery](https://docs.microsoft.com/en-us/powershell/scripting/gallery/getting-started).
+   The [module](https://www.powershellgallery.com/packages/powdrgit/1.3.0) is available through the [PowerShell Gallery](https://docs.microsoft.com/en-us/powershell/scripting/gallery/getting-started).
    Run the following command in a PowerShell console to install the module:
    ```
    Install-Module -Name powdrgit -Force
@@ -156,6 +158,12 @@ Powdrgit has a module variable, `$Powdrgit`, that has various properties that ca
 - **.AutoCompleteFullPaths**:
   - When set to `$true`, autocompletion values for any `-Repo` parameter will always show the full path of the repository. When set to `$false`, if the repository name is unique within Powdrgit, then only the name of the repository is shown. If a repository name is not unique within Powdrgit, the full path is always shown.
   - Default is `$false`.
+- **.BranchExcludes**:
+  - PowerShell object array that contains filters used to limit the branches displayed with Get-Gitbranch.
+  - Default is an empty object: [PSCustomObject]@{ RepoPattern = ''; BranchPattern = ''; ApplyTo = '' }.
+- **.BranchExcludesNoWarn**:
+  - Suppresses the warning message shown by Get-GitBranch when branches have been excluded by a filter.
+  - Default is `$false`.
 - **.DebugIndentChar**:
   - Debug output is indented to match the nested depth of the function. The first character of `$Powdrgit.DebugIndentChar` is used as the first character of the indent.
   - Default is `>`.
@@ -171,12 +179,24 @@ Powdrgit has a module variable, `$Powdrgit`, that has various properties that ca
 - **.DefaultInitialCommit**:
   - When creating new repositories, it may be desirable to make an initial commit to the repository before any further changes are made. `New-GitRepo` allows the message for the initial commit to be specified. If the same message is always required for the initial commit, the message can be specified in `$Powdrgit.DefaultInitialCommit` and applied using the `-UseDefaultInitialCommit` switch.
   - Default is `'Initial commit'`.
-- **.ShowWarnings**:
-  - Controls whether Powdrgit generates warnings.
-  - Default is `$true`.
+- **.DiffLineColorNew**:
+  - Color to use for displaying new (added) lines in a diff with Format-GitDiff.
+  - Default is `'Cyan'`.
+- **.DiffLineColorOld**:
+  - Color to use for displaying old (removed) lines in a diff with Format-GitDiff.
+  - Default is `'Magenta'`.
+- **.DiffLineColorSame**:
+  - Color to use for displaying unchanged lines in a diff with Format-GitDiff.
+  - Default is `'DarkGray'`.
+- **.DiffLineColorSame**:
+  - Color to use for displaying file summary information in a diff with Format-GitDiff.
+  - Default is `'Gray'`.
 - **.Path**:
   - As described earlier, `$Powdrgit.Path` holds a semicolon separated list of repository paths. A repository's path needs to be in `$Powdrgit.Path` for the repository to be visible in Powdrgit.
   - Default is `$null`.
+- **.ShowWarnings**:
+  - Controls whether Powdrgit generates warnings.
+  - Default is `$true`.
 
 ----------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------
@@ -206,6 +226,12 @@ Get-GitLog -InRef feature -NotInRef main | Get-GitCommitFile
 ```
 
 
+View a nicely formatted diff of changes since the previous commit:
+```
+Get-GitDiff | Format-GitDiff
+```
+
+
 Capture all the output from a git command in a variable:
 ```
 $results = Invoke-GitExpression -Command 'git status'
@@ -221,6 +247,24 @@ Git reference documentation can be found [here](https://git-scm.com/docs).
 ----------------------------------------------------------------------------------------------------
 
 ## RELEASE HISTORY
+### 1.3.0 (2023-02-04)
+- New functions:
+	- Get-GitDiff
+	- Format-GitDiff
+- Update functions:
+	- Find-GitRepo:
+		- Handle literal paths that look like wildcard paths
+	- Get-GitBranch:
+		- Update BranchName to show (what would be) the local name of remote only branches
+		- Populate Upstream and UpstreamFullName for remote branches
+		- Add RemoteName property
+		- Generate separate warnings for local and remote branches excluded by filtering
+		- Add -Force switch to override filtering
+	- Set-GitBranch
+		- Allow checking out remote branches with (what would be) the local branch name
+		- Add -Force switch to override filtering
+
+
 ### 1.2.0 (2022-11-06)
 - Update functions:
 	- Find-GitRepo:

@@ -7,6 +7,10 @@
 ,	"DefaultDir"                : null
 ,	"DefaultGitScriptSeparator" : ";"
 ,	"DefaultInitialCommit"      : "Initial commit"
-,	"ShowWarnings"              : true
+,	"DiffLineColorNew"          : "Cyan"
+,	"DiffLineColorOld"          : "Magenta"
+,	"DiffLineColorSame"         : "DarkGray"
+,	"DiffLineColorSummary"      : "Gray"
 ,	"Path"                      : null
+,	"ShowWarnings"              : true
 }

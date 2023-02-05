@@ -188,19 +188,32 @@ function Find-GitRepo
 	{
 		$bk = 'P'
 
-		If (!$Path)
+		$literalPaths = New-Object -TypeName System.Collections.ArrayList
+		ForEach ($_path in $Path)
 		{
-			$Path = Get-Volume `
-					| Where-Object { $_.DriveType -eq 'Fixed' -and $_.DriveLetter } `
-					| Select-Object @{ l = 'DrivePath'; e = {$_.DriveLetter+':\'} } `
-					| Sort-Object -Property DrivePath `
-					| Select-Object -ExpandProperty DrivePath
-			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Setting root directory list to $Path"
+			If (Test-Path -LiteralPath $_path)
+			{
+				$literalPaths += $_path
+			}
+			Else
+			{
+				$literalPaths += Resolve-Path -Path $_path | Select-Object -ExpandProperty Path
+			}
+		}
+
+		If (!$literalPaths)
+		{
+			$literalPaths = Get-Volume `
+							| Where-Object { $_.DriveType -eq 'Fixed' -and $_.DriveLetter } `
+							| Select-Object @{ l = 'DrivePath'; e = {$_.DriveLetter+':\'} } `
+							| Sort-Object -Property DrivePath `
+							| Select-Object -ExpandProperty DrivePath
+			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Setting root directory list to $literalPaths"
 		}
 
 		$gitReposAll = New-Object -TypeName System.Collections.ArrayList
 
-		ForEach ($_path in $Path)
+		ForEach ($_path in $literalPaths)
 		{
 			$gitReposDir = New-Object -TypeName System.Collections.ArrayList
 

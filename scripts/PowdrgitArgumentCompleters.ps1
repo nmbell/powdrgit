@@ -81,16 +81,16 @@ Register-ArgumentCompleter -CommandName 'Set-GitBranch' -ParameterName BranchNam
 
 
 # Set-GitBranch:*Out
-# Write-GitBranchOut:OutputStream
+# Write-GitOut:OutputStream
 $argumentCompleter =
 {
 	Param ($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameters)
 	@('None','Pipe')+[Enum]::GetValues([System.ConsoleColor]) | Where-Object { $_ -like "$wordToComplete*" }
 }
-Register-ArgumentCompleter -CommandName 'Set-GitBranch'      -ParameterName HeaderOut    -ScriptBlock $argumentCompleter
-Register-ArgumentCompleter -CommandName 'Set-GitBranch'      -ParameterName CommandOut   -ScriptBlock $argumentCompleter
-Register-ArgumentCompleter -CommandName 'Set-GitBranch'      -ParameterName ResultsOut   -ScriptBlock $argumentCompleter
-Register-ArgumentCompleter -CommandName 'Write-GitBranchOut' -ParameterName OutputStream -ScriptBlock $argumentCompleter
+Register-ArgumentCompleter -CommandName 'Set-GitBranch' -ParameterName HeaderOut    -ScriptBlock $argumentCompleter
+Register-ArgumentCompleter -CommandName 'Set-GitBranch' -ParameterName CommandOut   -ScriptBlock $argumentCompleter
+Register-ArgumentCompleter -CommandName 'Set-GitBranch' -ParameterName ResultsOut   -ScriptBlock $argumentCompleter
+Register-ArgumentCompleter -CommandName 'Write-GitOut'  -ParameterName OutputStream -ScriptBlock $argumentCompleter
 
 
 <#

@@ -17,7 +17,7 @@ function Get-GitBranch
 	The names of the branches to be checked out.
 	Wildcard characters are allowed. The pattern will match against existing branches in the specified repository.
 	A warning will be generated for any values that do not match the name of an existing branch.
-	Branches can be suppressed from results on either a global, local only, or remote only basis using by setting the $Powdrgit.BranchExcludes value (see examples).
+	Branches can be suppressed from results on either a global, local only, or remote only basis by adding filters to $Powdrgit.BranchExcludes value (see examples).
 	RepoPattern is a regular expression evaluated against RepoName to identify repositories that the filter will be applied to.
 	BranchPattern is a regular expression evaluated against BranchFullName to identify branches that will be excluded from results.
 	ApplyTo can be used to limit the filtering to either local branches, remote branches, or either.
@@ -27,6 +27,7 @@ function Get-GitBranch
 
 	.PARAMETER Current
 	Limits the results to the current branch of the specified repository; otherwise, all matching branch names will be returned.
+	Implies Force.
 
 	.PARAMETER CurrentFirst
 	Forces the current branch to be the first returned item.
@@ -45,6 +46,9 @@ function Get-GitBranch
 	.PARAMETER SetLocation
 	Sets the working directory to the top-level directory of the specified repository.
 	In the case where multiple Repo values are passed in, the location will reflect the repository that was specified last.
+
+	.PARAMETER Force
+	Return all branches even when a matching filter in $Powdrgit.BranchExcludes exists.
 
 	.EXAMPLE
 	## Call from outside a repository without parameters ##
@@ -229,12 +233,28 @@ function Get-GitBranch
 	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 	PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
 	PS C:\> $Powdrgit.BranchExcludesNoWarn = $false # to ensure warnings are visible
-	PS C:\> $Powdrgit.BranchExcludes += [PSCustomObject]@{ RepoPattern = '.*'; BranchPattern = 'feature\d'; ApplyTo = 'Local' }
+	PS C:\> $Powdrgit.BranchExcludes = [PSCustomObject]@{ RepoPattern = '.*'; BranchPattern = 'feature\d'; ApplyTo = 'Local' }
 	PS C:\> Get-GitBranch -Repo MyToolbox | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 	WARNING: [Get-GitBranch]Branches excluded due to conditions in $Powdrgit.BranchExcludes: 4
 
 	RepoName  BranchName IsCheckedOut IsRemote
 	--------  ---------- ------------ --------
+	MyToolbox main               True    False
+	MyToolbox release           False    False
+
+	.EXAMPLE
+	## Show all branches including branches usually hidden from results with $Powdrgit.BranchExcludes ##
+
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+	PS C:\> $Powdrgit.BranchExcludesNoWarn = $false # to ensure warnings are visible
+	PS C:\> $Powdrgit.BranchExcludes = [PSCustomObject]@{ RepoPattern = '.*'; BranchPattern = 'feature\d'; ApplyTo = 'Local' }
+	PS C:\> Get-GitBranch -Repo MyToolbox -Force | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+
+	RepoName  BranchName IsCheckedOut IsRemote
+	--------  ---------- ------------ --------
+	MyToolbox feature1          False    False
+	MyToolbox feature3          False    False
 	MyToolbox main               True    False
 	MyToolbox release           False    False
 
@@ -325,6 +345,9 @@ function Get-GitBranch
 	,	[Switch]
 		$SetLocation
 
+	,	[Switch]
+		$Force
+
 	)
 
 	BEGIN
@@ -351,6 +374,7 @@ function Get-GitBranch
 		$sortIsCheckedOutFirst = @{ Expression = 'IsCheckedOut'; Descending = $true }
 		$sortIsCheckedOutLast  = @{ Expression = 'IsCheckedOut'; Ascending  = $true }
 		$sortIsRemote          = @{ Expression = 'IsRemote'    ; Ascending  = $true }
+		If ($Current) { $Force = $true }
 	}
 
 	PROCESS
@@ -372,10 +396,10 @@ function Get-GitBranch
 			ForEach ($_branchName in $BranchName) { $unmatchedBranchNames.$_branchName = $null }
 
 			# Get branch filters for this repository
-			$branchExcludeFilters = $Powdrgit.BranchExcludes | Where-Object { $_.RepoPattern -and $_.BranchPattern -and $validRepo.RepoName -match $_.RepoPattern -and ($_.ApplyTo -in 'Local','Remote','Global','',$null) }
+			$branchExcludeFilters = New-Object -TypeName System.Collections.ArrayList
+			ForEach ($bep in $Powdrgit.BranchExcludes | Where-Object { $_.RepoPattern -and $_.BranchPattern -and $validRepo.RepoName -match $_.RepoPattern -and ($_.ApplyTo -in 'Local','Remote','Global','',$null) }) { $branchExcludeFilters += $bep }
 			$branchExcludeFiltersCount = If ($branchExcludeFilters) { $branchExcludeFilters.Count } Else { 0 }
 			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found branch exclusion filters: $('{0,3}' -f $branchExcludeFiltersCount)"
-			$branchExcludeCount   = 0
 
 			# Move to the repository directory
 			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Moving to the repository directory: $($validRepo.RepoPath)"
@@ -383,32 +407,34 @@ function Get-GitBranch
 
 			# Get local branch info
 			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finding local branch info"
-			$gitCommand = 'git for-each-ref "refs/heads" --format="%(objectname)\%(refname)\%(HEAD)\%(upstream)"' # separate with \ as this is not allowed in branch names
+			$gitCommand = 'git for-each-ref "refs/heads" --format="%(objectname)\%(refname)\%(HEAD)\%(upstream)\%(upstream:short)\%(upstream:remotename)"' # separate with \ as this is not allowed in branch names
 			$gitResults = Invoke-GitExpression -Command $gitCommand -SuppressGitErrorStream
+			$localBranchNames = New-Object -TypeName System.Collections.arrayList
+			$branchExcludeCountLocal = 0
 			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found local  branches: $('{0,3}' -f ($gitResults | Measure-Object).Count)"
 			ForEach ($line in $gitResults | Where-Object { $_.Trim() })
 			{
 				$lineSplit = $line.Split('\')
 
-				$branchFullName   = $lineSplit[1]
-				$isCheckedOut     = $lineSplit[2] -eq '*'
-				$upstreamFullName = $lineSplit[3]
-				$thisBranchName   = $branchFullName -replace '^refs/\w+/',''
-				$upstreamName     = $upstreamFullName.Replace('refs/remotes/','')
-				$branchLeafName   = Split-Path -Path $branchFullName -Leaf
+				$branchFullName    = $lineSplit[1]
+				$thisBranchName    = $branchFullName.Replace('refs/heads/','')
+				$localBranchNames += $thisBranchName
 
 				ForEach ($_branchName in $BranchName)
 				{
 					If ($thisBranchName -like $_branchName)
 					{
 						$branchExcluded = $false
-
-						ForEach ($pattern in $branchExcludeFilters | Where-Object { $_.ApplyTo -in 'Local','Global','',$null } | Select-Object -ExpandProperty BranchPattern)
+						If (!$Force)
 						{
-							If ($branchFullName -match $pattern)
+							ForEach ($pattern in ($branchExcludeFilters | Where-Object { $_.ApplyTo -in 'Local','Global','',$null } | Select-Object -ExpandProperty BranchPattern))
 							{
-								$branchExcluded = $true
-								$branchExcludeCount++
+								If ($branchFullName -match $pattern)
+								{
+									Write-Debug "$(ts)$indent[$thisFunctionName][$bk]Branch excluded by filter: $thisBranchName"
+									$branchExcluded = $true
+									$branchExcludeCountLocal++
+								}
 							}
 						}
 
@@ -419,12 +445,13 @@ function Get-GitBranch
 								'RepoPath'         = $validRepo.RepoPath
 								'SHA1Hash'         = $lineSplit[0]
 								'BranchName'       = $thisBranchName
-								'IsCheckedOut'     = $isCheckedOut
+								'IsCheckedOut'     = $lineSplit[2] -eq '*'
 								'IsRemote'         = $false
-								'BranchLeafName'   = $branchLeafName
+								'BranchLeafName'   = Split-Path -Path $branchFullName -Leaf
 								'BranchFullName'   = $branchFullName
-								'Upstream'         = $upstreamName
-								'UpstreamFullName' = $upstreamFullName
+								'Upstream'         = $lineSplit[4]
+								'UpstreamFullName' = $lineSplit[3]
+								'RemoteName'       = $lineSplit[5]
 							}
 							$unmatchedBranchNames.Remove($_branchName)
 						}
@@ -432,34 +459,45 @@ function Get-GitBranch
 				}
 			}
 
+			# Warn if any local branches were excluded by filters
+			If ($branchExcludeCountLocal -and !$ExcludeLocal)
+			{
+				If ($warn -and !$Powdrgit.BranchExcludesNoWarn) { Write-Warning "[$thisFunctionName]Local  branches excluded due to conditions in `$Powdrgit.BranchExcludes: $branchExcludeCountLocal" }
+			}
+
 			# Get remote branch info
 			Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Finding remote branch info"
 			$gitCommand = 'git for-each-ref "refs/remotes" --format="%(objectname)\%(refname)"' # separate with \ as this is not allowed in branch names
 			$gitResults = Invoke-GitExpression -Command $gitCommand -SuppressGitErrorStream
+			$branchExcludeCountRemote = 0
 			Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Found remote branches: $('{0,3}' -f ($gitResults | Measure-Object).Count)"
 			ForEach ($line in $gitResults | Where-Object { $_.Trim() })
 			{
 				$lineSplit = $line.Split('\')
 
 				$branchFullName = $lineSplit[1]
-				$thisBranchName = $branchFullName -replace '^refs/\w+/',''
+				$thisBranchName = $branchFullName -replace '^refs/remotes/\w+/',''
+				$upstreamName   = $branchFullName.Replace('refs/remotes/','')
 				$branchLeafName = Split-Path -Path $branchFullName -Leaf
 
-				If ($matchingBranches.Count -gt 0 -and $branchFullName -in $matchingBranches.UpstreamFullName) { Continue } # omit remote branches that are the upstream for a local one
-				If ($branchLeafName -eq 'HEAD') { Continue }                                                                # omit HEAD
+				If ($localBranchNames.Count -gt 0 -and $thisBranchName -in $localBranchNames) { Continue } # omit remote branches that are the upstream for a local one
+				If ($branchLeafName -eq 'HEAD') { Continue }                                               # omit HEAD
 
 				ForEach ($_branchName in $BranchName)
 				{
 					If ($thisBranchName -like $_branchName)
 					{
 						$branchExcluded = $false
-
-						ForEach ($pattern in $branchExcludeFilters | Where-Object { $_.ApplyTo -in 'Remote','Global','',$null } | Select-Object -ExpandProperty BranchPattern)
+						If (!$Force)
 						{
-							If ($branchFullName -match $pattern)
+							ForEach ($pattern in $branchExcludeFilters | Where-Object { $_.ApplyTo -in 'Remote','Global','',$null } | Select-Object -ExpandProperty BranchPattern)
 							{
-								$branchExcluded = $true
-								$branchExcludeCount++
+								If ($branchFullName -match $pattern)
+								{
+									Write-Debug "$(ts)$indent[$thisFunctionName][$bk]Branch excluded by filter: $thisBranchName"
+									$branchExcluded = $true
+									$branchExcludeCountRemote++
+								}
 							}
 						}
 
@@ -474,8 +512,9 @@ function Get-GitBranch
 								'IsRemote'         = $true
 								'BranchLeafName'   = $branchLeafName
 								'BranchFullName'   = $branchFullName
-								'Upstream'         = $null
-								'UpstreamFullName' = $null
+								'Upstream'         = $upstreamName
+								'UpstreamFullName' = $branchFullName
+								'RemoteName'       = $upstreamName -replace '^(\w+)/.*','$1'
 							}
 							$unmatchedBranchNames.Remove($_branchName)
 						}
@@ -483,10 +522,10 @@ function Get-GitBranch
 				}
 			}
 
-			# Warn if any branches were excluded by filters
-			If ($branchExcludeCount)
+			# Warn if any remote branches were excluded by filters
+			If ($branchExcludeCountRemote -and $IncludeRemote)
 			{
-				If ($warn -and !$Powdrgit.BranchExcludesNoWarn) { Write-Warning "[$thisFunctionName]Branches excluded due to conditions in `$Powdrgit.BranchExcludes: $branchExcludeCount" }
+				If ($warn -and !$Powdrgit.BranchExcludesNoWarn) { Write-Warning "[$thisFunctionName]Remote branches excluded due to conditions in `$Powdrgit.BranchExcludes: $branchExcludeCountRemote" }
 			}
 
 			# Warn if any BranchName values didn't match a branch

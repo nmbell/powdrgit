@@ -6,7 +6,7 @@ Checks out the specified branches for the specified repository.
 ## SYNTAX
 
 ```
-Set-GitBranch [[-Repo] <String[]>] [-BranchName] <String[]> [-SetLocation] [-GitScript <String>] [-HeaderOut <String>] [-CommandOut <String>] [-ResultsOut <String>] [-GitScriptSeparator <String>] [-WhatIf]
+Set-GitBranch [[-Repo] <String[]>] [-BranchName] <String[]> [-Force] [-SetLocation] [-GitScript <String>] [-HeaderOut <String>] [-CommandOut <String>] [-ResultsOut <String>] [-GitScriptSeparator <String>] [-WhatIf]
  [-Confirm] [<CommonParameters>]
 ```
 
@@ -176,6 +176,22 @@ nothing to commit, working tree clean
 # By piping the results of Get-GitRepo | Get-GitBranch into Set-GitBranch, we can see the status of all branches in all repositories in a single command.
 ```
 
+### EXAMPLE 10
+```
+## Check out a branch usually hidden from results with $Powdrgit.BranchExcludes ##
+
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+PS C:\> $Powdrgit.BranchExcludesNoWarn = $false # to ensure warnings are visible
+PS C:\> $Powdrgit.BranchExcludes = [PSCustomObject]@{ RepoPattern = '.*'; BranchPattern = 'feature\d'; ApplyTo = 'Global' }
+PS C:\> Set-GitBranch -Repo MyToolbox -BranchName feature1 -Force
+PS C:\> Get-GitBranch -Repo MyToolbox -Current | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+
+RepoName  BranchName IsCheckedOut IsRemote
+--------  ---------- ------------ --------
+MyToolbox feature1           True    False
+```
+
 ## PARAMETERS
 
 ### -BranchName
@@ -211,6 +227,21 @@ Aliases:
 Required: False
 Position: Named
 Default value: Green
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Force
+Checks out the specified branches even when a matching filter in $Powdrgit.BranchExcludes exists.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

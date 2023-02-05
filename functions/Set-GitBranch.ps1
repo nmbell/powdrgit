@@ -19,6 +19,9 @@ function Set-GitBranch
 	Wildcard characters are allowed. The pattern will match against existing branches in the specified repository.
 	A warning will be generated for any values that do not match the name of an existing branch.
 
+	.PARAMETER Force
+	Checks out the specified branches even when a matching filter in $Powdrgit.BranchExcludes exists.
+
 	.PARAMETER SetLocation
 	Sets the working directory to the top-level directory of the specified repository.
 	In the case where multiple Repo values are passed in, the location will reflect the repository that was specified last.
@@ -196,6 +199,20 @@ function Set-GitBranch
 
 	# By piping the results of Get-GitRepo | Get-GitBranch into Set-GitBranch, we can see the status of all branches in all repositories in a single command.
 
+	.EXAMPLE
+	## Check out a branch usually hidden from results with $Powdrgit.BranchExcludes ##
+
+	PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+	PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+	PS C:\> $Powdrgit.BranchExcludesNoWarn = $false # to ensure warnings are visible
+	PS C:\> $Powdrgit.BranchExcludes = [PSCustomObject]@{ RepoPattern = '.*'; BranchPattern = 'feature\d'; ApplyTo = 'Global' }
+	PS C:\> Set-GitBranch -Repo MyToolbox -BranchName feature1 -Force
+	PS C:\> Get-GitBranch -Repo MyToolbox -Current | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+
+	RepoName  BranchName IsCheckedOut IsRemote
+	--------  ---------- ------------ --------
+	MyToolbox feature1           True    False
+
 	.INPUTS
 	[System.String[]]
 	Accepts string objects via the Repo parameter. The output of Get-GitBranch can be piped into Set-GitTag.
@@ -260,6 +277,9 @@ function Set-GitBranch
 	#	[ArgumentCompleter()]
 		[String[]]
 		$BranchName = '*'
+
+	,	[Switch]
+		$Force
 
 	,	[Switch]
 		$SetLocation
@@ -329,31 +349,32 @@ function Set-GitBranch
 			Set-GitRepo -Repo $validRepo.RepoPath -WarningAction Ignore
 
 			# Get matching branches
-			$validBranches = Get-GitBranch -Repo $validRepo.RepoPath -BranchName $BranchName -IncludeRemote -Verbose:$false -Debug:$false | Select-Object -ExpandProperty BranchName
+			$validBranches = Get-GitBranch -Repo $validRepo.RepoPath -BranchName $BranchName -IncludeRemote -Force:$Force -Verbose:$false -Debug:$false -WarningAction Ignore #| Select-Object -ExpandProperty BranchName
 
 			# Set branches
 			ForEach ($validBranch in $validBranches)
 			{
-				Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Checking out branch $validBranch"
-				$gitCommand = "git checkout $validBranch"
+				$localBranchName = If ($validBranch.IsRemote) { $validBranch.BranchName -replace "^$($validBranch.RemoteName)/",'' } Else { $validBranch.BranchName }
+				Write-Verbose "$(ts)$indent[$thisFunctionName][$bk]Checking out branch $localBranchName"
+				$gitCommand = "git checkout $localBranchName"
 				$gitResults = Invoke-GitExpression -Command $gitCommand
-				$currentBranch = Get-GitBranch -Current -Verbose:$false -Debug:$false | Select-Object -ExpandProperty BranchName
+				$currentBranch = Get-GitBranch -Current -Verbose:$false -Debug:$false -WarningAction Ignore | Select-Object -ExpandProperty BranchName
 				Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Current branch is $currentBranch"
-				If ($currentBranch -ne $validBranch)
+				If ($currentBranch -ne $localBranchName)
 				{
 					$gitResults | Out-String | Write-Host
-					If ($warn) { Write-Warning "[$thisFunctionName]Failed to checkout branch $validBranch`:" }
+					If ($warn) { Write-Warning "[$thisFunctionName]Failed to checkout branch $localBranchName`:" }
 				}
 				Else
 				{
 					Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Writing header"
-					Write-GitBranchOut -OutputType Header -OutputValue "`r`n$($validRepo.RepoName) | $validBranch" -OutputStream $HeaderOut
+					Write-GitOut -OutputType Header -OutputValue "`r`n$($validRepo.RepoName) | $localBranchName" -OutputStream $HeaderOut
 
 					If ($GitScript)
 					{
 						Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Executing script block"
 						If (!$PSBoundParameters.ContainsKey('GitScriptSeparator')) { $GitScriptSeparator = $Powdrgit.DefaultGitScriptSeparator }
-						If (!$GitScriptSeparator) { $GitScriptSeparator = 'z%G1+$jNMuU%XUCASoPf312osOOjMHCOnh+kn3Ke' } # some unlikely to occur string
+						If (!$GitScriptSeparator) { $GitScriptSeparator = 'z%G1+$jNMuU%XUCASoPf312osOOjMHCOnh+kn3Ke' } # some unlikely-to-occur string
 						Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Separator: $GitScriptSeparator"
 						$GitScript = $GitScript.Replace('`'+$GitScriptSeparator,'<separator>') # to preserve escaped separators
 						$gitScriptLines = $GitScript.Split($GitScriptSeparator)
@@ -363,7 +384,7 @@ function Set-GitBranch
 							$line = $line.Replace('<separator>',$GitScriptSeparator).Trim()
 
 							Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Writing command"
-							Write-GitBranchOut -OutputType Command -OutputValue $line -OutputStream $CommandOut
+							Write-GitOut -OutputType Body -OutputValue $line -OutputStream $CommandOut
 
 							# results
 							$shouldText = $line

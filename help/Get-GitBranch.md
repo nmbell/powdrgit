@@ -7,22 +7,25 @@ Gets a list of branches for the specified repository.
 
 ### Remote (Default)
 ```
-Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-IncludeRemote] [-ExcludeLocal] [-SetLocation] [<CommonParameters>]
+Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-IncludeRemote] [-ExcludeLocal] [-SetLocation]
+ [-Force] [<CommonParameters>]
 ```
 
 ### Current
 ```
-Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-Current] [-SetLocation] [<CommonParameters>]
+Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-Current] [-SetLocation] [-Force] [<CommonParameters>]
 ```
 
 ### CurrentFirst
 ```
-Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-CurrentFirst] [-IncludeRemote] [-SetLocation] [<CommonParameters>]
+Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-CurrentFirst] [-IncludeRemote] [-SetLocation]
+ [-Force] [<CommonParameters>]
 ```
 
 ### CurrentLast
 ```
-Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-CurrentLast] [-IncludeRemote] [-SetLocation] [<CommonParameters>]
+Get-GitBranch [[-Repo] <String[]>] [[-BranchName] <String[]>] [-CurrentLast] [-IncludeRemote] [-SetLocation]
+ [-Force] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -241,12 +244,30 @@ Project1  newfeature         True    False C:\PowdrgitExamples\Project1
 PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
 PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
 PS C:\> $Powdrgit.BranchExcludesNoWarn = $false # to ensure warnings are visible
-PS C:\> $Powdrgit.BranchExcludes += [PSCustomObject]@{ RepoPattern = '.*'; BranchPattern = 'feature\d'; ApplyTo = 'Local' }
+PS C:\> $Powdrgit.BranchExcludes = [PSCustomObject]@{ RepoPattern = '.*'; BranchPattern = 'feature\d'; ApplyTo = 'Local' }
 PS C:\> Get-GitBranch -Repo MyToolbox | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
 WARNING: [Get-GitBranch]Branches excluded due to conditions in $Powdrgit.BranchExcludes: 4
 
 RepoName  BranchName IsCheckedOut IsRemote
 --------  ---------- ------------ --------
+MyToolbox main               True    False
+MyToolbox release           False    False
+```
+
+### EXAMPLE 15
+```
+## Show all branches including branches usually hidden from results with $Powdrgit.BranchExcludes ##
+
+PS C:\> $Powdrgit.Path = 'C:\PowdrgitExamples\MyToolbox;C:\PowdrgitExamples\Project1' # to ensure the repository paths are defined
+PS C:\> $Powdrgit.ShowWarnings = $true # to ensure warnings are visible
+PS C:\> $Powdrgit.BranchExcludesNoWarn = $false # to ensure warnings are visible
+PS C:\> $Powdrgit.BranchExcludes = [PSCustomObject]@{ RepoPattern = '.*'; BranchPattern = 'feature\d'; ApplyTo = 'Local' }
+PS C:\> Get-GitBranch -Repo MyToolbox -Force | Format-Table -Property RepoName,BranchName,IsCheckedOut,IsRemote
+
+RepoName  BranchName IsCheckedOut IsRemote
+--------  ---------- ------------ --------
+MyToolbox feature1          False    False
+MyToolbox feature3          False    False
 MyToolbox main               True    False
 MyToolbox release           False    False
 ```
@@ -258,7 +279,7 @@ The names of the branches to be checked out.
 Wildcard characters are allowed.
 The pattern will match against existing branches in the specified repository.
 A warning will be generated for any values that do not match the name of an existing branch.
-Branches can be suppressed from results on either a global, local only, or remote only basis using by setting the $Powdrgit.BranchExcludes value (see examples).
+Branches can be suppressed from results on either a global, local only, or remote only basis by adding filters to $Powdrgit.BranchExcludes value (see examples).
 RepoPattern is a regular expression evaluated against RepoName to identify repositories that the filter will be applied to.
 BranchPattern is a regular expression evaluated against BranchFullName to identify branches that will be excluded from results.
 ApplyTo can be used to limit the filtering to either local branches, remote branches, or either.
@@ -283,6 +304,7 @@ Accept wildcard characters: False
 
 ### -Current
 Limits the results to the current branch of the specified repository; otherwise, all matching branch names will be returned.
+Implies Force.
 
 ```yaml
 Type: SwitchParameter
@@ -334,6 +356,21 @@ Excludes local branches from the output.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Remote
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Force
+Return all branches even when a matching filter in $Powdrgit.BranchExcludes exists.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
 Aliases:
 
 Required: False

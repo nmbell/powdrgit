@@ -11,6 +11,7 @@ class GitBranch
 	[String]$BranchFullName
 	[String]$Upstream
 	[String]$UpstreamFullName
+	[String]$RemoteName
 
 	[String]ToString(){ Return $this.BranchName }
 

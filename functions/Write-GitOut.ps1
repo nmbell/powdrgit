@@ -1,4 +1,4 @@
-function Write-GitBranchOut
+function Write-GitOut
 {
 	<#
 	.SYNOPSIS
@@ -8,13 +8,16 @@ function Write-GitBranchOut
 	Writes a formatted output.
 
 	.PARAMETER OutputType
-	Header or Command.
+	Header or Body.
 
 	.PARAMETER OutputValue
 	The value to output.
 
 	.PARAMETER OutputStream
 	The stream to output to.
+
+	.PARAMETER NoNewLine
+	Suppresses the new line at the end of the write.
 
 	.INPUTS
 	[System.String]
@@ -46,18 +49,25 @@ function Write-GitBranchOut
 	Param(
 
 		[Parameter(Mandatory = $true)]
-	  	[ValidateSet('Header','Command')]
+	  	[ValidateSet('Header','Body')]
 		[String]
 		$OutputType
 
-	, 	[Parameter(Mandatory = $true)]
-		[String]
+	, 	[Parameter(
+		  Mandatory                       = $false
+		, ValueFromPipeline               = $true
+		, ValueFromPipelineByPropertyName = $true
+		)]
+		[System.Object]
 		$OutputValue
 
 	,	[Parameter(Mandatory = $true)]
 	#	[ArgumentCompleter()]
 		[String]
 		$OutputStream
+
+	,	[Switch]
+		$NoNewLine
 
 	)
 
@@ -80,7 +90,8 @@ function Write-GitBranchOut
 	{
 		$bk = 'P'
 
-		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Writing $OutputType"
+		Write-Debug "  $(ts)$indent[$thisFunctionName][$bk]Writing $OutputType to $OutputStream"
+		If (!$OutputValue) { $OutputValue = '' }
 		If ($OutputStream -ne 'None')
 		{
 			If ($OutputStream -eq 'Pipe')
@@ -94,11 +105,11 @@ function Write-GitBranchOut
 					$foregroundColor = 'Black'
 					If ($OutputStream -in 'Black','Blue','DarkBlue','DarkCyan','DarkGray','DarkGreen','DarkMagenta','DarkRed') { $foregroundColor = 'White' }
 					[Microsoft.PowerShell.PSConsoleReadLine]::ScrollDisplayDownLine() # https://github.com/PowerShell/PowerShell/issues/15130
-					Write-Host $OutputValue -ForegroundColor $foregroundColor -BackgroundColor $OutputStream
+					Write-Host $OutputValue -ForegroundColor $foregroundColor -BackgroundColor $OutputStream -NoNewLine:$NoNewLine
 				}
-				If ($OutputType -eq 'Command')
+				If ($OutputType -eq 'Body')
 				{
-					Write-Host $OutputValue -ForegroundColor $OutputStream
+					Write-Host $OutputValue -ForegroundColor $OutputStream -NoNewLine:$NoNewLine
 				}
 			}
 		}
